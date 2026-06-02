@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexus CRM — Panel de Ventas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F5F3EE;
+    --surface: #FFFFFF;
+    --surface-alt: #EFEDE7;
+    --ink: #1A1814;
+    --ink-2: #5A5650;
+    --ink-3: #9A9590;
+    --accent: #2D6A4F;
+    --accent-light: #D8EDE4;
+    --accent-2: #C8521A;
+    --accent-2-light: #FAE8DF;
+    --border: rgba(26,24,20,0.10);
+    --border-strong: rgba(26,24,20,0.18);
+    --shadow: 0 2px 16px rgba(26,24,20,0.07);
+    --shadow-lg: 0 8px 40px rgba(26,24,20,0.12);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --sidebar-w: 220px;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    min-height: 100vh;
+    background: var(--ink);
+    display: flex;
+    flex-direction: column;
+    padding: 28px 0;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+
+  .sidebar-logo {
+    padding: 0 24px 28px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .sidebar-logo .logo-word {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 22px;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+  .sidebar-logo .logo-word span { color: #6EE7B7; }
+  .sidebar-logo .logo-sub {
+    font-size: 10px;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    padding: 20px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .nav-label {
+    font-size: 9.5px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.25);
+    padding: 14px 12px 6px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.55);
+    cursor: pointer;
+    transition: all .18s;
+    text-decoration: none;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,.85); }
+  .nav-item.active { background: rgba(110,231,183,0.12); color: #6EE7B7; }
+  .nav-item .nav-icon { font-size: 16px; width: 18px; text-align: center; }
+
+  .sidebar-user {
+    padding: 16px 20px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .user-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: linear-gradient(135deg, #6EE7B7, #2D6A4F);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600; color: #fff; flex-shrink: 0;
+  }
+  .user-info { min-width: 0; }
+  .user-name { font-size: 12.5px; color: #fff; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .user-role { font-size: 10.5px; color: rgba(255,255,255,0.35); margin-top: 1px; }
+
+  /* ── MAIN ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .topbar-left { display: flex; flex-direction: column; }
+  .topbar-title { font-family: 'Fraunces', serif; font-weight: 300; font-size: 18px; color: var(--ink); letter-spacing: -0.3px; }
+  .topbar-sub { font-size: 11px; color: var(--ink-3); margin-top: 1px; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+  .topbar-date { font-size: 12px; color: var(--ink-3); padding: 6px 14px; background: var(--bg); border-radius: 999px; }
+  .status-pill { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--accent); background: var(--accent-light); padding: 5px 12px; border-radius: 999px; font-weight: 500; }
+  .status-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  /* ── CONTENT ── */
+  .content { padding: 28px 32px; flex: 1; }
+
+  /* ── KPI ROW ── */
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    transition: box-shadow .2s;
+  }
+  .kpi-card:hover { box-shadow: var(--shadow); }
+  .kpi-label { font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; font-weight: 500; }
+  .kpi-value { font-family: 'Fraunces', serif; font-size: 34px; font-weight: 600; color: var(--ink); margin: 6px 0 4px; letter-spacing: -1px; line-height: 1; }
+  .kpi-delta { font-size: 11.5px; display: flex; align-items: center; gap: 4px; }
+  .kpi-delta.up { color: var(--accent); }
+  .kpi-delta.neutral { color: var(--ink-3); }
+  .kpi-icon { float: right; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 17px; }
+  .kpi-icon.green { background: var(--accent-light); color: var(--accent); }
+  .kpi-icon.orange { background: var(--accent-2-light); color: var(--accent-2); }
+  .kpi-icon.blue { background: #DDF0FF; color: #1B6EAA; }
+  .kpi-icon.purple { background: #EDE8FD; color: #6B3FD4; }
+
+  /* ── TWO-COL LAYOUT ── */
+  .two-col { display: grid; grid-template-columns: 1fr 360px; gap: 18px; margin-bottom: 18px; }
+
+  /* ── PANEL ── */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .panel-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .panel-title { font-size: 14px; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 8px; }
+  .panel-title .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+  .panel-body { padding: 20px 22px; }
+
+  /* ── FORM ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-field { display: flex; flex-direction: column; gap: 5px; }
+  .form-field.full { grid-column: 1 / -1; }
+  .form-field label { font-size: 11.5px; font-weight: 600; color: var(--ink-2); letter-spacing: .03em; text-transform: uppercase; }
+  .form-field input,
+  .form-field select,
+  .form-field textarea {
+    padding: 10px 13px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px;
+    color: var(--ink);
+    background: var(--bg);
+    outline: none;
+    transition: border .15s, box-shadow .15s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .form-field input:focus,
+  .form-field select:focus,
+  .form-field textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(45,106,79,0.12);
+  }
+  .form-field textarea { resize: vertical; min-height: 80px; }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239A9590' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer; }
+
+  .btn-submit {
+    width: 100%;
+    margin-top: 16px;
+    padding: 11px;
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: .02em;
+    transition: background .18s, transform .1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+  }
+  .btn-submit:hover { background: #2D2B27; }
+  .btn-submit:active { transform: scale(.99); }
+  .btn-submit .btn-icon { font-size: 15px; }
+
+  /* ── BALANCE CARDS ── */
+  .vendor-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    transition: box-shadow .18s;
+  }
+  .vendor-card:last-child { margin-bottom: 0; }
+  .vendor-card:hover { box-shadow: var(--shadow); }
+  .vendor-top { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .v-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: #6EE7B7; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .v-name { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+  .v-tag { font-size: 10px; color: var(--ink-3); }
+  .v-metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
+  .v-metric { background: var(--bg); border-radius: 6px; padding: 8px 10px; text-align: center; }
+  .v-metric-val { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 600; color: var(--ink); line-height: 1; }
+  .v-metric-lbl { font-size: 10px; color: var(--ink-3); margin-top: 3px; text-transform: uppercase; letter-spacing: .06em; }
+
+  .refresh-btn {
+    padding: 7px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    background: transparent;
+    color: var(--ink-2);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background .15s;
+  }
+  .refresh-btn:hover { background: var(--bg); }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    padding: 10px 16px;
+    font-size: 10.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .09em;
+    color: var(--ink-3);
+    text-align: left;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  tbody td { padding: 12px 16px; font-size: 13px; color: var(--ink); border-bottom: 1px solid var(--border); }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr { transition: background .12s; }
+  tbody tr:hover td { background: var(--bg); }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 500;
+  }
+  .chip-call { background: #DDF0FF; color: #1B6EAA; }
+  .chip-msg { background: var(--accent-light); color: var(--accent); }
+  .chip-visit { background: var(--accent-2-light); color: var(--accent-2); }
+  .chip-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+  .cell-muted { color: var(--ink-3); font-style: italic; }
+  .cell-date { color: var(--ink-3); font-size: 12px; white-space: nowrap; }
+  .cell-vendor { display: flex; align-items: center; gap: 8px; }
+  .mini-avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: #6EE7B7; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background: var(--ink);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all .25s;
+    pointer-events: none;
+    z-index: 100;
+  }
+  #toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ── EMPTY STATE ── */
+  .empty-row td { padding: 28px 16px; color: var(--ink-3); font-style: italic; font-size: 13px; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+  .panel { animation: fadeUp .35s ease both; }
+  .kpi-card { animation: fadeUp .35s ease both; }
+  .kpi-card:nth-child(1) { animation-delay: .05s; }
+  .kpi-card:nth-child(2) { animation-delay: .10s; }
+  .kpi-card:nth-child(3) { animation-delay: .15s; }
+  .kpi-card:nth-child(4) { animation-delay: .20s; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-word">Nexus<span>CRM</span></div>
+    <div class="logo-sub">Sales Intelligence</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Principal</div>
+    <a class="nav-item active" href="#">
+      <span class="nav-icon">⬛</span> Panel
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">◎</span> Clientes
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">◈</span> Oportunidades
+    </a>
+    <div class="nav-label">Reportes</div>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">▣</span> Análisis
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">◧</span> Exportar
+    </a>
+    <div class="nav-label">Equipo</div>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">◉</span> Vendedores
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">⊙</span> Configuración
+    </a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar">GD</div>
+    <div class="user-info">
+      <div class="user-name">Gerencia</div>
+      <div class="user-role">Administrador</div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title">Panel de ventas</div>
+      <div class="topbar-sub">Gestión y seguimiento de actividades comerciales</div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-date" id="fechaHoy">—</div>
+      <div class="status-pill">Sistema activo</div>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- KPIs -->
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-icon green" style="float:right">📞</div>
+        <div class="kpi-label">Llamadas hoy</div>
+        <div class="kpi-value" id="kpi-llamadas">—</div>
+        <div class="kpi-delta up" id="kpi-llamadas-d">Cargando...</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon blue" style="float:right">💬</div>
+        <div class="kpi-label">Mensajes hoy</div>
+        <div class="kpi-value" id="kpi-mensajes">—</div>
+        <div class="kpi-delta up" id="kpi-mensajes-d">Cargando...</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon orange" style="float:right">🚗</div>
+        <div class="kpi-label">Visitas hoy</div>
+        <div class="kpi-value" id="kpi-visitas">—</div>
+        <div class="kpi-delta neutral" id="kpi-visitas-d">Cargando...</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon purple" style="float:right">⚡</div>
+        <div class="kpi-label">Total actividades</div>
+        <div class="kpi-value" id="kpi-total">—</div>
+        <div class="kpi-delta up" id="kpi-total-d">Cargando...</div>
+      </div>
+    </div>
+
+    <!-- FORM + BALANCE -->
+    <div class="two-col">
+
+      <!-- FORM -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><span class="dot"></span>Registrar actividad</div>
+        </div>
+        <div class="panel-body">
+          <div class="form-grid">
+            <div class="form-field">
+              <label>Vendedor</label>
+              <select id="vendedor">
+                <option value="Ismael">Ismael</option>
+                <option value="David">David</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Tipo de actividad</label>
+              <select id="tipoActividad">
+                <option value="llamada">☎ Llamada telefónica</option>
+                <option value="mensaje">✉ Mensaje / Email</option>
+                <option value="visita">🚗 Visita presencial</option>
+              </select>
+            </div>
+            <div class="form-field full">
+              <label>Cliente / Empresa</label>
+              <input type="text" id="cliente" placeholder="Nombre de la empresa o contacto">
+            </div>
+            <div class="form-field full">
+              <label>Notas de la actividad</label>
+              <textarea id="notas" placeholder="Resumen de la conversación, acuerdos, próximos pasos..."></textarea>
+            </div>
+          </div>
+          <button class="btn-submit" onclick="registrarActividad()">
+            <span class="btn-icon">＋</span> Guardar actividad
+          </button>
+        </div>
+      </div>
+
+      <!-- BALANCE -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title"><span class="dot" style="background:#C8521A"></span>Balance por vendedor</div>
+          <button class="refresh-btn" onclick="obtenerBalance()">↺ Actualizar</button>
+        </div>
+        <div class="panel-body" id="balanceContainer">
+          <p style="font-size:13px;color:var(--ink-3)">Cargando datos...</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- HISTORIAL TABLE -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title"><span class="dot" style="background:#1B6EAA"></span>Historial de actividades</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha y hora</th>
+              <th>Vendedor</th>
+              <th>Cliente</th>
+              <th>Actividad</th>
+              <th>Notas</th>
+            </tr>
+          </thead>
+          <tbody id="historialTbody">
+            <tr class="empty-row"><td colspan="5">Cargando historial...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<div id="toast"></div>
+
+<script>
+  const API_URL = "http://localhost:3000/api";
+
+  // Fecha actual en topbar
+  document.getElementById('fechaHoy').textContent = new Date().toLocaleDateString('es-CO', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
+
+  function toast(msg, ok = true) {
+    const t = document.getElementById('toast');
+    t.textContent = (ok ? '✓ ' : '✗ ') + msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function chipHtml(tipo) {
+    const map = {
+      llamada:  ['chip-call',  'Llamada'],
+      mensaje:  ['chip-msg',   'Mensaje'],
+      visita:   ['chip-visit', 'Visita'],
+      llamadas: ['chip-call',  'Llamada'],
+      mensajes: ['chip-msg',   'Mensaje'],
+      visitas:  ['chip-visit', 'Visita'],
+    };
+    const [cls, label] = map[tipo] || ['chip-call', tipo];
+    return `<span class="chip ${cls}"><span class="chip-dot"></span>${label}</span>`;
+  }
+
+  function initials(name) {
+    return name.slice(0, 2).toUpperCase();
+  }
+
+  function fmtNombre(n) {
+    return n.charAt(0).toUpperCase() + n.slice(1);
+  }
+
+  // ── Balance ──
+  async function obtenerBalance() {
+    try {
+      const r = await fetch(`${API_URL}/balance?t=${Date.now()}`);
+      const data = await r.json();
+      const container = document.getElementById('balanceContainer');
+
+      let totalLl = 0, totalMsg = 0, totalVis = 0;
+      let html = '';
+
+      for (const vendedor in data) {
+        const m = data[vendedor];
+        totalLl  += m.llamadas || 0;
+        totalMsg += m.mensajes || 0;
+        totalVis += m.visitas  || 0;
+        const nombre = fmtNombre(vendedor);
+        html += `
+          <div class="vendor-card">
+            <div class="vendor-top">
+              <div class="v-avatar">${initials(nombre)}</div>
+              <div>
+                <div class="v-name">${nombre}</div>
+                <div class="v-tag">Ejecutivo de ventas</div>
+              </div>
+            </div>
+            <div class="v-metrics">
+              <div class="v-metric">
+                <div class="v-metric-val">${m.llamadas}</div>
+                <div class="v-metric-lbl">Llamadas</div>
+              </div>
+              <div class="v-metric">
+                <div class="v-metric-val">${m.mensajes}</div>
+                <div class="v-metric-lbl">Mensajes</div>
+              </div>
+              <div class="v-metric">
+                <div class="v-metric-val">${m.visitas}</div>
+                <div class="v-metric-lbl">Visitas</div>
+              </div>
+            </div>
+          </div>`;
+      }
+
+      container.innerHTML = html || '<p style="color:var(--ink-3);font-size:13px">Sin datos.</p>';
+
+      // Actualizar KPIs
+      document.getElementById('kpi-llamadas').textContent = totalLl;
+      document.getElementById('kpi-mensajes').textContent = totalMsg;
+      document.getElementById('kpi-visitas').textContent = totalVis;
+      const total = totalLl + totalMsg + totalVis;
+      document.getElementById('kpi-total').textContent = total;
+      document.getElementById('kpi-llamadas-d').textContent = 'Total acumulado';
+      document.getElementById('kpi-mensajes-d').textContent = 'Total acumulado';
+      document.getElementById('kpi-visitas-d').textContent = 'Total acumulado';
+      document.getElementById('kpi-total-d').textContent = 'Todas las actividades';
+
+    } catch (e) {
+      document.getElementById('balanceContainer').innerHTML =
+        '<p style="color:#C8521A;font-size:13px">No se pudo conectar al servidor.</p>';
+    }
+  }
+
+  // ── Historial ──
+  async function obtenerHistorial() {
+    try {
+      const r = await fetch(`${API_URL}/historial?t=${Date.now()}`);
+      const acts = await r.json();
+      const tbody = document.getElementById('historialTbody');
+
+      if (!acts.length) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="5">Sin actividades registradas aún.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = acts.slice().reverse().map(act => {
+        const nombre = fmtNombre(act.vendedor);
+        return `
+          <tr>
+            <td class="cell-date">${act.fecha}</td>
+            <td><div class="cell-vendor"><div class="mini-avatar">${initials(nombre)}</div>${nombre}</div></td>
+            <td><strong>${act.cliente}</strong></td>
+            <td>${chipHtml(act.tipoActividad)}</td>
+            <td class="${act.notas ? '' : 'cell-muted'}">${act.notas || 'Sin notas'}</td>
+          </tr>`;
+      }).join('');
+
+    } catch (e) {
+      document.getElementById('historialTbody').innerHTML =
+        '<tr class="empty-row"><td colspan="5">Error al cargar el historial.</td></tr>';
+    }
+  }
+
+  // ── Registrar ──
+  async function registrarActividad() {
+    const cliente = document.getElementById('cliente').value.trim();
+    if (!cliente) { toast('Ingresa el nombre del cliente.', false); return; }
+
+    const actividad = {
+      vendedor: document.getElementById('vendedor').value,
+      cliente,
+      tipoActividad: document.getElementById('tipoActividad').value,
+      notas: document.getElementById('notas').value
+    };
+
+    try {
+      const r = await fetch(`${API_URL}/registrar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(actividad)
+      });
+      const res = await r.json();
+      if (r.ok) {
+        document.getElementById('cliente').value = '';
+        document.getElementById('notas').value = '';
+        toast('Actividad registrada correctamente.');
+        obtenerBalance();
+        obtenerHistorial();
+      } else {
+        toast(res.error || 'Error al guardar.', false);
+      }
+    } catch (e) {
+      toast('No se pudo conectar al servidor.', false);
+    }
+  }
+
+  // Init
+  obtenerBalance();
+  obtenerHistorial();
+</script>
+</body>
+</html>
