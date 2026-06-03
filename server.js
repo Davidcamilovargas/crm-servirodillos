@@ -93,37 +93,30 @@ app.get('/api/historial', (req, res) => {
 });
 
 // 3. Ruta para REGISTRAR una actividad (POST) - Guarda directamente en MySQL
+// 3. Ruta para REGISTRAR una actividad (POST) - Versión optimizada con ID
 app.post('/api/registrar', (req, res) => {
-    let { vendedor, cliente, tipoActividad, notas } = req.body;
+    let { vendedor, cliente, tipoActividad, notas } = req.body; // 'vendedor' ahora es el ID (ej: 1 o 2)
 
-    const vendedorClave = vendedor ? vendedor.trim() : '';
     let tipoClave = tipoActividad ? tipoActividad.trim().toLowerCase() : '';
 
     if (tipoClave.includes('llamada')) tipoClave = 'llamadas';
     if (tipoClave.includes('mensaje')) tipoClave = 'mensajes';
     if (tipoClave.includes('visita'))  tipoClave = 'visitas';
 
-    // PASO A: Buscamos el ID del vendedor usando su nombre (sin importar mayúsculas/minúsculas)
-    db.query('SELECT id FROM vendedores WHERE LOWER(nombre) = LOWER(?)', [vendedorClave], (err, rows) => {
-        if (err) return res.status(500).json({ error: err.message });
-        
-        if (rows.length === 0) {
-            return res.status(400).json({ error: `El vendedor '${vendedorClave}' no existe en la base de datos.` });
+    // ¡Mucho más directo! Insertamos usando directamente el ID que mandó el select del frontend
+    const insertQuery = 'INSERT INTO actividades (vendedor_id, cliente, tipo_actividad, notas) VALUES (?, ?, ?, ?)';
+    
+    db.query(insertQuery, [vendedor, cliente, tipoClave, notas], (err, result) => {
+        if (err) {
+            console.error("❌ Error al insertar actividad:", err);
+            return res.status(500).json({ error: err.message });
         }
 
-        const vendedorId = rows[0].id;
+        console.log(`✅ ¡Actividad guardada en MySQL para el vendedor ID: ${vendedor}!`);
 
-        // PASO B: Insertamos la actividad en la tabla usando el ID del vendedor
-        const insertQuery = 'INSERT INTO actividades (vendedor_id, cliente, tipo_actividad, notas) VALUES (?, ?, ?, ?)';
-        db.query(insertQuery, [vendedorId, cliente, tipoClave, notas], (err, result) => {
-            if (err) return res.status(500).json({ error: err.message });
-
-            console.log(`✅ ¡Actividad guardada en MySQL para el vendedor ID: ${vendedorId}!`);
-
-            res.json({
-                mensaje: "¡Actividad registrada y guardada permanentemente en MySQL!",
-                idActividad: result.insertId
-            });
+        res.json({
+            mensaje: "¡Actividad registrada y guardada permanentemente en MySQL!",
+            idActividad: result.insertId
         });
     });
 });
