@@ -3,362 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nexus CRM — Panel de Ventas</title>
+<title>Servirodillos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Fraunces:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">  
 
-  :root {
-    --bg: #F5F3EE;
-    --surface: #FFFFFF;
-    --surface-alt: #EFEDE7;
-    --ink: #1A1814;
-    --ink-2: #5A5650;
-    --ink-3: #9A9590;
-    --accent: #2D6A4F;
-    --accent-light: #D8EDE4;
-    --accent-2: #C8521A;
-    --accent-2-light: #FAE8DF;
-    --border: rgba(26,24,20,0.10);
-    --border-strong: rgba(26,24,20,0.18);
-    --shadow: 0 2px 16px rgba(26,24,20,0.07);
-    --shadow-lg: 0 8px 40px rgba(26,24,20,0.12);
-    --radius: 12px;
-    --radius-sm: 8px;
-    --sidebar-w: 220px;
-  }
-
-  html { font-size: 16px; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--ink);
-    min-height: 100vh;
-    display: flex;
-  }
-
-  /* ── SIDEBAR ── */
-  .sidebar {
-    width: var(--sidebar-w);
-    min-height: 100vh;
-    background: var(--ink);
-    display: flex;
-    flex-direction: column;
-    padding: 28px 0;
-    flex-shrink: 0;
-    position: sticky;
-    top: 0;
-    height: 100vh;
-  }
-
-  .sidebar-logo {
-    padding: 0 24px 28px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-  }
-  .sidebar-logo .logo-word {
-    font-family: 'Fraunces', serif;
-    font-weight: 300;
-    font-size: 22px;
-    color: #fff;
-    letter-spacing: -0.5px;
-  }
-  .sidebar-logo .logo-word span { color: #6EE7B7; }
-  .sidebar-logo .logo-sub {
-    font-size: 10px;
-    color: rgba(255,255,255,0.35);
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    margin-top: 2px;
-  }
-
-  .sidebar-nav {
-    flex: 1;
-    padding: 20px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-  .nav-label {
-    font-size: 9.5px;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.25);
-    padding: 14px 12px 6px;
-  }
-  .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 9px 12px;
-    border-radius: 8px;
-    font-size: 13.5px;
-    color: rgba(255,255,255,0.55);
-    cursor: pointer;
-    transition: all .18s;
-    text-decoration: none;
-  }
-  .nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,.85); }
-  .nav-item.active { background: rgba(110,231,183,0.12); color: #6EE7B7; }
-  .nav-item .nav-icon { font-size: 16px; width: 18px; text-align: center; }
-
-  .sidebar-user {
-    padding: 16px 20px;
-    border-top: 1px solid rgba(255,255,255,0.08);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .user-avatar {
-    width: 32px; height: 32px; border-radius: 50%;
-    background: linear-gradient(135deg, #6EE7B7, #2D6A4F);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 600; color: #fff; flex-shrink: 0;
-  }
-  .user-info { min-width: 0; }
-  .user-name { font-size: 12.5px; color: #fff; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .user-role { font-size: 10.5px; color: rgba(255,255,255,0.35); margin-top: 1px; }
-
-  /* ── MAIN ── */
-  .main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-  }
-
-  /* ── TOPBAR ── */
-  .topbar {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 32px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-  .topbar-left { display: flex; flex-direction: column; }
-  .topbar-title { font-family: 'Fraunces', serif; font-weight: 300; font-size: 18px; color: var(--ink); letter-spacing: -0.3px; }
-  .topbar-sub { font-size: 11px; color: var(--ink-3); margin-top: 1px; }
-  .topbar-right { display: flex; align-items: center; gap: 10px; }
-  .topbar-date { font-size: 12px; color: var(--ink-3); padding: 6px 14px; background: var(--bg); border-radius: 999px; }
-  .status-pill { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--accent); background: var(--accent-light); padding: 5px 12px; border-radius: 999px; font-weight: 500; }
-  .status-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
-
-  /* ── CONTENT ── */
-  .content { padding: 28px 32px; flex: 1; }
-
-  /* ── KPI ROW ── */
-  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
-  .kpi-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px 22px;
-    transition: box-shadow .2s;
-  }
-  .kpi-card:hover { box-shadow: var(--shadow); }
-  .kpi-label { font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; font-weight: 500; }
-  .kpi-value { font-family: 'Fraunces', serif; font-size: 34px; font-weight: 600; color: var(--ink); margin: 6px 0 4px; letter-spacing: -1px; line-height: 1; }
-  .kpi-delta { font-size: 11.5px; display: flex; align-items: center; gap: 4px; }
-  .kpi-delta.up { color: var(--accent); }
-  .kpi-delta.neutral { color: var(--ink-3); }
-  .kpi-icon { float: right; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 17px; }
-  .kpi-icon.green { background: var(--accent-light); color: var(--accent); }
-  .kpi-icon.orange { background: var(--accent-2-light); color: var(--accent-2); }
-  .kpi-icon.blue { background: #DDF0FF; color: #1B6EAA; }
-  .kpi-icon.purple { background: #EDE8FD; color: #6B3FD4; }
-
-  /* ── TWO-COL LAYOUT ── */
-  .two-col { display: grid; grid-template-columns: 1fr 360px; gap: 18px; margin-bottom: 18px; }
-
-  /* ── PANEL ── */
-  .panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-  .panel-header {
-    padding: 18px 22px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .panel-title { font-size: 14px; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 8px; }
-  .panel-title .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
-  .panel-body { padding: 20px 22px; }
-
-  /* ── FORM ── */
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .form-field { display: flex; flex-direction: column; gap: 5px; }
-  .form-field.full { grid-column: 1 / -1; }
-  .form-field label { font-size: 11.5px; font-weight: 600; color: var(--ink-2); letter-spacing: .03em; text-transform: uppercase; }
-  .form-field input,
-  .form-field select,
-  .form-field textarea {
-    padding: 10px 13px;
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius-sm);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13.5px;
-    color: var(--ink);
-    background: var(--bg);
-    outline: none;
-    transition: border .15s, box-shadow .15s;
-    appearance: none;
-    -webkit-appearance: none;
-  }
-  .form-field input:focus,
-  .form-field select:focus,
-  .form-field textarea:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(45,106,79,0.12);
-  }
-  .form-field textarea { resize: vertical; min-height: 80px; }
-  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239A9590' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer; }
-
-  .btn-submit {
-    width: 100%;
-    margin-top: 16px;
-    padding: 11px;
-    background: var(--ink);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius-sm);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13.5px;
-    font-weight: 600;
-    cursor: pointer;
-    letter-spacing: .02em;
-    transition: background .18s, transform .1s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-  }
-  .btn-submit:hover { background: #2D2B27; }
-  .btn-submit:active { transform: scale(.99); }
-  .btn-submit .btn-icon { font-size: 15px; }
-
-  /* ── BALANCE CARDS ── */
-  .vendor-card {
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 14px 16px;
-    margin-bottom: 10px;
-    transition: box-shadow .18s;
-  }
-  .vendor-card:last-child { margin-bottom: 0; }
-  .vendor-card:hover { box-shadow: var(--shadow); }
-  .vendor-top { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-  .v-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: #6EE7B7; font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .v-name { font-size: 13.5px; font-weight: 600; color: var(--ink); }
-  .v-tag { font-size: 10px; color: var(--ink-3); }
-  .v-metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; }
-  .v-metric { background: var(--bg); border-radius: 6px; padding: 8px 10px; text-align: center; }
-  .v-metric-val { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 600; color: var(--ink); line-height: 1; }
-  .v-metric-lbl { font-size: 10px; color: var(--ink-3); margin-top: 3px; text-transform: uppercase; letter-spacing: .06em; }
-
-  .refresh-btn {
-    padding: 7px 14px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    background: transparent;
-    color: var(--ink-2);
-    border: 1px solid var(--border-strong);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: background .15s;
-  }
-  .refresh-btn:hover { background: var(--bg); }
-
-  /* ── TABLE ── */
-  .table-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; }
-  thead th {
-    padding: 10px 16px;
-    font-size: 10.5px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .09em;
-    color: var(--ink-3);
-    text-align: left;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-  tbody td { padding: 12px 16px; font-size: 13px; color: var(--ink); border-bottom: 1px solid var(--border); }
-  tbody tr:last-child td { border-bottom: none; }
-  tbody tr { transition: background .12s; }
-  tbody tr:hover td { background: var(--bg); }
-
-  .chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 3px 10px;
-    border-radius: 999px;
-    font-size: 11.5px;
-    font-weight: 500;
-  }
-  .chip-call { background: #DDF0FF; color: #1B6EAA; }
-  .chip-msg { background: var(--accent-light); color: var(--accent); }
-  .chip-visit { background: var(--accent-2-light); color: var(--accent-2); }
-  .chip-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
-
-  .cell-muted { color: var(--ink-3); font-style: italic; }
-  .cell-date { color: var(--ink-3); font-size: 12px; white-space: nowrap; }
-  .cell-vendor { display: flex; align-items: center; gap: 8px; }
-  .mini-avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: #6EE7B7; font-size: 10px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-
-  /* ── TOAST ── */
-  #toast {
-    position: fixed;
-    bottom: 28px;
-    right: 28px;
-    background: var(--ink);
-    color: #fff;
-    padding: 12px 20px;
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    font-weight: 500;
-    box-shadow: var(--shadow-lg);
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all .25s;
-    pointer-events: none;
-    z-index: 100;
-  }
-  #toast.show { opacity: 1; transform: translateY(0); }
-
-  /* ── EMPTY STATE ── */
-  .empty-row td { padding: 28px 16px; color: var(--ink-3); font-style: italic; font-size: 13px; }
-
-  /* ── ANIMATIONS ── */
-  @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-  .panel { animation: fadeUp .35s ease both; }
-  .kpi-card { animation: fadeUp .35s ease both; }
-  .kpi-card:nth-child(1) { animation-delay: .05s; }
-  .kpi-card:nth-child(2) { animation-delay: .10s; }
-  .kpi-card:nth-child(3) { animation-delay: .15s; }
-  .kpi-card:nth-child(4) { animation-delay: .20s; }
-</style>
 </head>
 <body>
 
+
+<!-- Hamburger (móvil) -->
+<button class="hamburger" id="hamburger" aria-label="Menú">
+  <span></span><span></span><span></span>
+</button>
+<div class="overlay" id="overlay"></div>
+
 <!-- SIDEBAR -->
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
-    <div class="logo-word">Nexus<span>CRM</span></div>
-    <div class="logo-sub">Sales Intelligence</div>
+    <div>
+      <div class="logo-word">Servi<span>rodillos</span></div>
+      <div class="logo-sub">Panel de Ventas</div>
+    </div>
   </div>
   <nav class="sidebar-nav">
     <div class="nav-label">Principal</div>
@@ -521,10 +188,10 @@
 
 <div id="toast"></div>
 
+<!-- SCRIPT PROGRAMA COMPLETO -->
 <script>
   const API_URL = "https://crm-servirodillos.onrender.com";
 
-  // Fecha actual en topbar
   document.getElementById('fechaHoy').textContent = new Date().toLocaleDateString('es-CO', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   });
@@ -532,6 +199,7 @@
   function toast(msg, ok = true) {
     const t = document.getElementById('toast');
     t.textContent = (ok ? '✓ ' : '✗ ') + msg;
+    t.style.borderLeftColor = ok ? 'var(--brand-green)' : 'var(--brand-orange)';
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3000);
   }
@@ -557,31 +225,26 @@
     return n.charAt(0).toUpperCase() + n.slice(1);
   }
 
-  // ── Cargar Vendedores Dinámicamente ──
-async function cargarVendedores() {
-  try {
-    const r = await fetch(`${API_URL}/api/vendedores`);
-    const vendedores = await r.json();
-    const select = document.getElementById('vendedor');
-    
-    // Limpiamos las opciones viejas y dejamos solo la inicial
-    select.innerHTML = '<option value="">Seleccione un vendedor...</option>';
-    
-    vendedores.forEach(v => {
-      const option = document.createElement('option');
-      option.value = v.id; // <-- Al servidor le llegará el NÚMERO (ID)
-      option.textContent = fmtNombre(v.nombre); // <-- El usuario verá "David vargas" o "Ismael"
-      select.appendChild(option);
-    });
-  } catch (e) {
-    console.error("❌ Error cargando la lista de vendedores:", e);
+  async function cargarVendedores() {
+    try {
+      const r = await fetch(`${API_URL}/api/vendedores`);
+      const vendedores = await r.json();
+      const select = document.getElementById('vendedor');
+      select.innerHTML = '<option value="">Seleccione un vendedor...</option>';
+      vendedores.forEach(v => {
+        const option = document.createElement('option');
+        option.value = v.id;
+        option.textContent = fmtNombre(v.nombre);
+        select.appendChild(option);
+      });
+    } catch (e) {
+      console.error("❌ Error cargando la lista de vendedores:", e);
+    }
   }
-}
 
-  // ── Balance ──
   async function obtenerBalance() {
     try {
-     const r = await fetch(`${API_URL}/api/balance?t=${Date.now()}`);
+      const r = await fetch(`${API_URL}/api/balance?t=${Date.now()}`);
       const data = await r.json();
       const container = document.getElementById('balanceContainer');
 
@@ -622,24 +285,22 @@ async function cargarVendedores() {
 
       container.innerHTML = html || '<p style="color:var(--ink-3);font-size:13px">Sin datos.</p>';
 
-      // Actualizar KPIs
       document.getElementById('kpi-llamadas').textContent = totalLl;
       document.getElementById('kpi-mensajes').textContent = totalMsg;
-      document.getElementById('kpi-visitas').textContent = totalVis;
+      document.getElementById('kpi-visitas').textContent  = totalVis;
       const total = totalLl + totalMsg + totalVis;
-      document.getElementById('kpi-total').textContent = total;
+      document.getElementById('kpi-total').textContent    = total;
       document.getElementById('kpi-llamadas-d').textContent = 'Total acumulado';
       document.getElementById('kpi-mensajes-d').textContent = 'Total acumulado';
-      document.getElementById('kpi-visitas-d').textContent = 'Total acumulado';
-      document.getElementById('kpi-total-d').textContent = 'Todas las actividades';
+      document.getElementById('kpi-visitas-d').textContent  = 'Total acumulado';
+      document.getElementById('kpi-total-d').textContent    = 'Todas las actividades';
 
     } catch (e) {
       document.getElementById('balanceContainer').innerHTML =
-        '<p style="color:#C8521A;font-size:13px">No se pudo conectar al servidor.</p>';
+        '<p style="color:var(--brand-orange-h);font-size:13px">No se pudo conectar al servidor.</p>';
     }
   }
 
-  // ── Historial ──
   async function obtenerHistorial() {
     try {
       const r = await fetch(`${API_URL}/api/historial?t=${Date.now()}`);
@@ -669,7 +330,6 @@ async function cargarVendedores() {
     }
   }
 
-  // ── Registrar ──
   async function registrarActividad() {
     const cliente = document.getElementById('cliente').value.trim();
     if (!cliente) { toast('Ingresa el nombre del cliente.', false); return; }
@@ -702,10 +362,36 @@ async function cargarVendedores() {
     }
   }
 
+  // Hamburger / overlay móvil
+  const sidebar   = document.getElementById('sidebar');
+  const hamburger = document.getElementById('hamburger');
+  const overlay   = document.getElementById('overlay');
+
+  hamburger.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('show');
+  });
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('show');
+  });
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+      el.classList.add('active');
+      if (window.innerWidth <= 720) {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+    });
+  });
+
   // Init
   obtenerBalance();
   obtenerHistorial();
   cargarVendedores();
 </script>
+
 </body>
 </html>
