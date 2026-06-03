@@ -149,6 +149,103 @@ body {
 .user-name  { font-size: 13px; font-weight: 600; color: #fff; }
 .user-role  { font-size: 11px; color: rgba(255,255,255,.35); }
 
+/* --- COMPONENTES NUEVOS DEL MENU LATERAL --- */
+
+/* Contenedor del Perfil */
+.user-profile-box {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px 15px;
+    margin-bottom: 25px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Círculo del Avatar */
+.avatar-circle {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: rgba(138, 43, 226, 0.2); /* Fondo morado neón sutil */
+    border: 1px solid rgba(138, 43, 226, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.avatar-circle i {
+    color: #00ff88; /* Icono verde neón */
+    font-size: 1.2rem;
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
+}
+
+/* Textos del Usuario */
+.user-info {
+    text-align: left;
+}
+
+.user-info h3 {
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+}
+
+/* Etiqueta del Rol */
+.badge-rol {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #8a2be2;
+    background: rgba(138, 43, 226, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(138, 43, 226, 0.2);
+}
+
+/* Estilo especial si es Administrador */
+.badge-admin {
+    color: #00ff88;
+    background: rgba(0, 255, 136, 0.1);
+    border-color: rgba(0, 255, 136, 0.2);
+}
+
+/* Botón Cerrar Sesión fijo abajo */
+.sidebar-footer {
+    margin-top: auto; /* Empuja el botón al fondo del menú si usas flexbox */
+    padding-top: 20px;
+}
+
+.btn-logout {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    background: transparent;
+    border: 1px solid rgba(239, 68, 68, 0.2); /* Borde rojo sutil */
+    border-radius: 10px;
+    color: #f87171; /* Texto rojizo */
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+    background: rgba(239, 68, 68, 0.1);
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+}
+
+.btn-logout i {
+    font-size: 1.1rem;
+}
+
 /* ─── HAMBURGER ────────────────────────── */
 .hamburger {
   display: none;

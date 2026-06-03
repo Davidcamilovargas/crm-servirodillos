@@ -60,6 +60,13 @@
       <div class="user-role">Administrador</div>
     </div>
   </div>
+
+  <div class="sidebar-footer">
+        <button onclick="cerrarSesion()" class="btn-logout">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Cerrar Sesión</span>
+        </button>
+    </div>
 </aside>
 
 <!-- MAIN -->
@@ -190,6 +197,63 @@
 
 <!-- SCRIPT PROGRAMA COMPLETO -->
 <script>
+// ==========================================
+// 🔒 1. CONTROL DE SESIÓN Y SEGURIDAD (AL FILO DE CARGAR)
+// ==========================================
+const usuarioSesion = JSON.parse(localStorage.getItem('usuarioCRM'));
+
+if (!usuarioSesion) {
+    // Si no ha iniciado sesión, de una para afuera al login
+    window.location.href = "/login";
+}
+
+// Variables globales para usar en todo el documento
+const ROL_USUARIO = usuarioSesion.rol;
+const ID_USUARIO = usuarioSesion.id;
+const NOMBRE_USUARIO = usuarioSesion.nombre;
+
+
+// ==========================================
+// ⚙️ INITIALIZACIÓN Y ADAPTACIÓN DE INTERFAZ
+// ==========================================
+document.addEventListener("DOMContentLoaded", () => {
+    console.log(`✨ Sesión activa: ${NOMBRE_USUARIO} (${ROL_USUARIO})`);
+
+    // 1. Pintamos el nombre del usuario en el menú lateral de forma segura
+    const lblNombre = document.getElementById('lblNombreUsuario');
+    if (lblNombre) {
+        lblNombre.textContent = NOMBRE_USUARIO;
+    }
+
+    // 2. Controlamos el selector de vendedores según el rol
+    const selectVendedor = document.getElementById('vendedor'); 
+
+    if (ROL_USUARIO === 'vendedor') {
+        // Si eres tú (David), el select se bloquea con tus datos para evitar errores
+        if (selectVendedor) {
+            selectVendedor.innerHTML = `<option value="${ID_USUARIO}">${fmtNombre(NOMBRE_USUARIO)}</option>`;
+            selectVendedor.disabled = true; 
+        }
+    } else {
+        // Si es Admin (Ismael), cargamos la lista de todos los vendedores
+        cargarVendedores(); 
+    }
+
+    // 3. Ejecutamos las llamadas iniciales
+    obtenerBalance();
+    obtenerHistorial();
+});
+
+// 🌟 FUNCIÓN GLOBAL PARA CERRAR SESIÓN (Para el botón del menú)
+function cerrarSesion() {
+    localStorage.removeItem('usuarioCRM');
+    window.location.href = "/login";
+}
+
+
+// ==========================================
+// 🔌 CONFIGURACIÓN DE LA API Y UTILERÍAS
+// ==========================================
   const API_URL = "https://crm-servirodillos.onrender.com";
 
   document.getElementById('fechaHoy').textContent = new Date().toLocaleDateString('es-CO', {
@@ -225,11 +289,17 @@
     return n.charAt(0).toUpperCase() + n.slice(1);
   }
 
+
+// ==========================================
+// 📡 FUNCIONES ASÍNCRONAS (API FETCH) ADAPTADAS A ROLES
+// ==========================================
   async function cargarVendedores() {
     try {
       const r = await fetch(`${API_URL}/api/vendedores`);
       const vendedores = await r.json();
       const select = document.getElementById('vendedor');
+      if (!select) return;
+      
       select.innerHTML = '<option value="">Seleccione un vendedor...</option>';
       vendedores.forEach(v => {
         const option = document.createElement('option');
@@ -244,7 +314,11 @@
 
   async function obtenerBalance() {
     try {
-      const r = await fetch(`${API_URL}/api/balance?t=${Date.now()}`);
+      // 🌟 CAMBIO: Si es vendedor, le inyectamos su ID a la URL. Si es admin, va limpio y trae todo.
+      const urlBase = `${API_URL}/api/balance?t=${Date.now()}`;
+      const urlFinal = ROL_USUARIO === 'vendedor' ? `${urlBase}&vendedorId=${ID_USUARIO}` : urlBase;
+
+      const r = await fetch(urlFinal);
       const data = await r.json();
       const container = document.getElementById('balanceContainer');
 
@@ -303,7 +377,11 @@
 
   async function obtenerHistorial() {
     try {
-      const r = await fetch(`${API_URL}/api/historial?t=${Date.now()}`);
+      // 🌟 CAMBIO: Si es vendedor, filtramos el historial agregando su vendedorId.
+      const urlBase = `${API_URL}/api/historial?t=${Date.now()}`;
+      const urlFinal = ROL_USUARIO === 'vendedor' ? `${urlBase}&vendedorId=${ID_USUARIO}` : urlBase;
+
+      const r = await fetch(urlFinal);
       const acts = await r.json();
       const tbody = document.getElementById('historialTbody');
 
@@ -320,7 +398,7 @@
             <td><div class="cell-vendor"><div class="mini-avatar">${initials(nombre)}</div>${nombre}</div></td>
             <td><strong>${act.cliente}</strong></td>
             <td>${chipHtml(act.tipoActividad)}</td>
-            <td class="${act.notas ? '' : 'cell-muted'}">${act.notas || 'Sin notas'}</td>
+            <td class="${act.notes ? '' : 'cell-muted'}">${act.notes || 'Sin notas'}</td>
           </tr>`;
       }).join('');
 
@@ -349,6 +427,10 @@
       });
       const res = await r.json();
       if (r.ok) {
+        // Si es admin limpiamos el selector, si es vendedor dejamos su ID fijo
+        if (ROL_USUARIO === 'admin') {
+            document.getElementById('vendedor').value = '';
+        }
         document.getElementById('cliente').value = '';
         document.getElementById('notas').value = '';
         toast('Actividad registrada correctamente.');
@@ -362,35 +444,38 @@
     }
   }
 
-  // Hamburger / overlay móvil
+
+// ==========================================
+// 📱 INTERFAZ MÓVIL Y LISTENERS DE CONTROL
+// ==========================================
   const sidebar   = document.getElementById('sidebar');
   const hamburger = document.getElementById('hamburger');
   const overlay   = document.getElementById('overlay');
 
-  hamburger.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
-    overlay.classList.toggle('show');
-  });
-  overlay.addEventListener('click', () => {
-    sidebar.classList.remove('open');
-    overlay.classList.remove('show');
-  });
+  if (hamburger) {
+      hamburger.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('show');
+      });
+  }
+  if (overlay) {
+      overlay.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('show');
+      });
+  }
+  
   document.querySelectorAll('.nav-item').forEach(el => {
     el.addEventListener('click', e => {
       e.preventDefault();
       document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
       el.classList.add('active');
-      if (window.innerWidth <= 720) {
+      if (window.innerWidth <= 720 && sidebar && overlay) {
         sidebar.classList.remove('open');
         overlay.classList.remove('show');
       }
     });
   });
-
-  // Init
-  obtenerBalance();
-  obtenerHistorial();
-  cargarVendedores();
 </script>
 
 </body>
