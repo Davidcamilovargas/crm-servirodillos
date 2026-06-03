@@ -454,8 +454,7 @@
             <div class="form-field">
               <label>Vendedor</label>
               <select id="vendedor">
-                <option value="Ismael">Ismael</option>
-                <option value="David">David</option>
+                <option value="">Seleccione un vendedor...</option>
               </select>
             </div>
             <div class="form-field">
@@ -557,6 +556,27 @@
   function fmtNombre(n) {
     return n.charAt(0).toUpperCase() + n.slice(1);
   }
+
+  // ── Cargar Vendedores Dinámicamente ──
+async function cargarVendedores() {
+  try {
+    const r = await fetch(`${API_URL}/api/vendedores`);
+    const vendedores = await r.json();
+    const select = document.getElementById('vendedor');
+    
+    // Limpiamos las opciones viejas y dejamos solo la inicial
+    select.innerHTML = '<option value="">Seleccione un vendedor...</option>';
+    
+    vendedores.forEach(v => {
+      const option = document.createElement('option');
+      option.value = v.id; // <-- Al servidor le llegará el NÚMERO (ID)
+      option.textContent = fmtNombre(v.nombre); // <-- El usuario verá "David vargas" o "Ismael"
+      select.appendChild(option);
+    });
+  } catch (e) {
+    console.error("❌ Error cargando la lista de vendedores:", e);
+  }
+}
 
   // ── Balance ──
   async function obtenerBalance() {
@@ -685,6 +705,7 @@
   // Init
   obtenerBalance();
   obtenerHistorial();
+  cargarVendedores();
 </script>
 </body>
 </html>

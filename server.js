@@ -39,7 +39,16 @@ db.connect((err) => {
 
 
 // --- RUTAS (ENDPOINTS) CON CONSULTAS A LA BASE DE DATOS ---
-
+app.get('/api/vendedores', (req, res) => {
+    const sql = "SELECT id, nombre FROM vendedores ORDER BY nombre ASC";
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error("❌ Error al traer vendedores:", err);
+            return res.status(500).json({ error: "Error en el servidor" });
+        }
+        res.json(results);
+    });
+});
 // 1. Ruta para ver el balance actual (GET) - Trae los datos calculados desde MySQL
 app.get('/api/balance', (req, res) => {
     const query = `
