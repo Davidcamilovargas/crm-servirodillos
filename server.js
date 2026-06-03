@@ -7,8 +7,16 @@ const PORT = process.env.PORT || 3000;
 
 // --- CONFIGURACIÓN DEL SERVIDOR ---
 app.use(cors());
+app.use(express.json());
+// 1. Sirve todos los archivos de tu carpeta (CSS, JS del cliente, imágenes)
 app.use(express.static(__dirname));
 
+// 2. Ruta para enviar el HTML principal al entrar a la raíz "/"
+const path = require('path');
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html')); 
+    // Nota: Si tu archivo visual se llama diferente a 'index.html', cambia ese nombre aquí.
+});
 // --- CONEXIÓN REAL A LA BASE DE DATOS ---
 const db = mysql.createConnection({
     host: process.env.DB_HOST || 'localhost',
