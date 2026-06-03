@@ -561,7 +561,7 @@
   // ── Balance ──
   async function obtenerBalance() {
     try {
-      const r = await fetch(`${API_URL}/balance?t=${Date.now()}`);
+     const r = await fetch(`${API_URL}/api/balance?t=${Date.now()}`);
       const data = await r.json();
       const container = document.getElementById('balanceContainer');
 
@@ -622,7 +622,7 @@
   // ── Historial ──
   async function obtenerHistorial() {
     try {
-      const r = await fetch(`${API_URL}/historial?t=${Date.now()}`);
+      const r = await fetch(`${API_URL}/api/historial?t=${Date.now()}`);
       const acts = await r.json();
       const tbody = document.getElementById('historialTbody');
 
@@ -662,7 +662,7 @@
     };
 
     try {
-      const r = await fetch(`${API_URL}/registrar`, {
+      const r = await fetch(`${API_URL}/api/registrar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(actividad)
