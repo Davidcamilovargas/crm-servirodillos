@@ -286,9 +286,82 @@
       
       cargarReporteMensual();
     });
-    // Función temporal para que no falle el botón mientras hacemos el formulario
+
+    // 🟢 PEGA ESTO EN SU LUGAR (FUNCIONES REALES DEL MODAL):
+
 function abrirModalPedido() {
-    alert("¡Pronto abriremos el formulario para agregar pedidos, David!");
+    // Cambiamos el display de 'none' a 'flex' para que se dibuje el modal en pantalla
+    document.getElementById('modalPedido').style.display = 'flex';
+    // Ponemos la fecha de hoy automáticamente en el calendario
+    document.getElementById('pedFecha').value = new Date().toISOString().split('T')[0];
+    
+    // Llamamos a la función que va a la base de datos por tus clientes
+    cargarClientesEnModal();
+}
+
+function cerrarModalPedido() {
+    // Escondemos el formulario de nuevo
+    document.getElementById('modalPedido').style.display = 'none';
+    document.getElementById('formNuevoPedido').reset();
+}
+
+// 🏢 TRAER CLIENTES REALES AL DESPLEGABLE DEL MODAL
+async function cargarClientesEnModal() {
+    try {
+        let idFiltro = ROL_USUARIO === 'vendedor' ? ID_USUARIO : null;
+        const urlBase = `${API_URL}/api/clientes`;
+        const urlFinal = idFiltro ? `${urlBase}?vendedorId=${idFiltro}` : urlBase;
+
+        const response = await fetch(urlFinal);
+        const clientes = await response.json();
+        const selectCliente = document.getElementById('pedCliente');
+
+        if (!selectCliente) return;
+
+        if (!clientes.length) {
+            selectCliente.innerHTML = '<option value="">No tienes clientes asignados</option>';
+            return;
+        }
+
+        // Llenamos el select con los nombres de tus empresas asignadas
+        selectCliente.innerHTML = '<option value="">-- Seleccione un cliente --</option>' + 
+            clientes.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
+    } catch (error) {
+        console.error("❌ Error cargando clientes en el modal:", error);
+    }
+}
+
+// 💾 PROCESAR Y GUARDAR EL PEDIDO EN LA BASE DE DATOS
+async function guardarPedido(event) {
+    event.preventDefault(); // Evita que la página se recargue sola y dañe el flujo
+
+    const nuevoPedido = {
+        fecha: document.getElementById('pedFecha').value,
+        numero_pedido: document.getElementById('pedNumero').value,
+        cliente_nombre: document.getElementById('pedCliente').value,
+        valor: document.getElementById('pedValor').value,
+        estado: document.getElementById('pedEstado').value,
+        vendedor_id: ID_USUARIO
+    };
+
+    try {
+        const response = await fetch(`${API_URL}/api/pedidos`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(nuevoPedido)
+        });
+
+        if (response.ok) {
+            cerrarModalPedido(); // Cerramos el modal si todo sale bien
+            cargarReporteMensual(); // 📊 Recargamos la tabla y KPIs al instante
+        } else {
+            const errData = await response.json();
+            alert("Error al guardar en el servidor: " + errData.error);
+        }
+    } catch (error) {
+        console.error("❌ Error conectando a la API de pedidos:", error);
+        alert("Error de conexión con el servidor de Render.");
+    }
 }
   </script>
 </body>
