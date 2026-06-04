@@ -446,36 +446,36 @@ function cerrarSesion() {
 
 
 // ==========================================
-// 📱 INTERFAZ MÓVIL Y LISTENERS DE CONTROL
+// 📱 INTERFAZ MÓVIL Y LISTENERS DE CONTROL (CORREGIDO)
 // ==========================================
-  const sidebar   = document.getElementById('sidebar');
-  const hamburger = document.getElementById('hamburger');
-  const overlay   = document.getElementById('overlay');
+const sidebar   = document.getElementById('sidebar');
+const hamburger = document.getElementById('hamburger');
+const overlay   = document.getElementById('overlay');
 
-  if (hamburger) {
-      hamburger.addEventListener('click', () => {
-        sidebar.classList.toggle('open');
-        overlay.classList.toggle('show');
-      });
-  }
-  if (overlay) {
-      overlay.addEventListener('click', () => {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('show');
-      });
-  }
-  
-  document.querySelectorAll('.nav-item').forEach(el => {
-    el.addEventListener('click', e => {
-      e.preventDefault();
-      document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
-      el.classList.add('active');
-      if (window.innerWidth <= 720 && sidebar && overlay) {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('show');
-      }
+if (hamburger) {
+    hamburger.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('show');
     });
+}
+if (overlay) {
+    overlay.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('show');
+    });
+}
+
+// 🌟 AQUÍ ESTÁ EL CAMBIO: Quitamos el e.preventDefault() para que los enlaces SÍ funcionen
+document.querySelectorAll('.nav-item').forEach(el => {
+  el.addEventListener('click', () => {
+    // Ya no cambiamos la clase active aquí con JS, se maneja directo en cada HTML
+    if (window.innerWidth <= 720 && sidebar && overlay) {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('show');
+    }
   });
+});
+
 </script>
 
 </body>
