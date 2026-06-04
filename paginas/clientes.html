@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Servirodillos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">  
+
+</head>
+<body>
+
+
+<!-- Hamburger (móvil) -->
+<button class="hamburger" id="hamburger" aria-label="Menú">
+  <span></span><span></span><span></span>
+</button>
+<div class="overlay" id="overlay"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div>
+      <div class="logo-word">Servi<span>rodillos</span></div>
+      <div class="logo-sub">Panel de Ventas</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Principal</div>
+    <a class="nav-item active" href="/index.html">
+      <span class="nav-icon">⬛</span> Panel
+    </a>
+    <a class="nav-item" href="/paginas/clientes.html">
+      <span class="nav-icon">◎</span> Clientes
+    </a>
+    <a class="nav-item" href="/paginas/oportunidades.html">
+      <span class="nav-icon">◈</span> Oportunidades
+    </a>
+    <div class="nav-label">Reportes</div>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">▣</span> Análisis
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">◧</span> Exportar
+    </a>
+    <div class="nav-label">Equipo</div>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">◉</span> Vendedores
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">⊙</span> Configuración
+    </a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar">GD</div>
+    <div class="user-info">
+      <div class="user-name">Gerencia</div>
+      <div class="user-role">Administrador</div>
+    </div>
+  </div>
+
+  <div class="sidebar-footer">
+        <button onclick="cerrarSesion()" class="btn-logout">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Cerrar Sesión</span>
+        </button>
+    </div>
+</aside>
+
+<!-- MAIN -->
+<style>
+        /* --- ESTILOS CYBERPUNK / GLASSMORPHISM REUTILIZADOS --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: #0f1015;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Estructura básica de dos columnas (Sidebar fija + Contenido) */
+        .sidebar {
+            width: 260px;
+            background: rgba(255, 255, 255, 0.02);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .card-glass {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .header-seccion {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Selector de Filtros estilo Cyberpunk */
+        .filter-box select {
+            background: #1a1c24;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            outline: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .filter-box select:focus {
+            border-color: #8a2be2;
+            box-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+        }
+
+        /* Tabla de Clientes */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(138, 43, 226, 0.1);
+            color: #a0aec0;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            font-size: 0.95rem;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        /* Chips de Importancia */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .alta { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .media { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .baja { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+
+        /* Links de navegación */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #8a92a6;
+            text-decoration: none;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .nav-item.active, .nav-item:hover {
+            color: #fff;
+            background: rgba(255,255,255,0.05);
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar">
+        <h2 style="font-size: 1.2rem; color: #00ff88; margin-bottom: 30px;"><i class="fa-solid fa-gears"></i> SERVIRODILLOS</h2>
+        <nav>
+            <a href="/" class="nav-item"><i class="fa-solid fa-chart-line"></i> Panel</a>
+            <a href="/clientes" class="nav-item active"><i class="fa-solid fa-users"></i> Clientes</a>
+        </nav>
+        
+        <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <p style="font-size: 0.85rem; color: #a0aec0; margin-bottom: 10px;">👤 <span id="lblNombreUsuario">...</span></p>
+            <button onclick="cerrarSesion()" style="background: #ff4444; color: white; border: none; padding: 8px; border-radius: 6px; width: 100%; cursor: pointer;">Cerrar Sesión</button>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="card-glass">
+            <div class="header-seccion">
+                <h2>👥 Base de Datos de Clientes</h2>
+                
+                <div class="filter-box" id="filtroAdmin" style="display: none;">
+                    <label style="color: #a0aec0; margin-right: 10px; font-size: 0.9rem;">Vendedor:</label>
+                    <select id="selectVendedor" onchange="filtrarPorVendedor()">
+                        <option value="">Todos los clientes</option>
+                        <option value="2">David Vargas</option>
+                        <option value="1">Ismael</option>
+                    </select>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Empresa</th>
+                        <th>Ciudad</th>
+                        <th>Teléfono Encargado</th>
+                        <th>Importancia</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaClientes">
+                    </tbody>
+            </table>
+        </div>
+    </main>
+<div id="toast"></div>
+
+    <script>
+        // 🔒 SEGURIDAD: Validar sesión
+        const usuarioSesion = JSON.parse(localStorage.getItem('usuarioCRM'));
+        if (!usuarioSesion) window.location.href = "/login";
+
+        const ROL_USUARIO = usuarioSesion.rol;
+        const ID_USUARIO = usuarioSesion.id;
+        const NOMBRE_USUARIO = usuarioSesion.nombre;
+
+        const API_URL = "https://crm-servirodillos.onrender.com";
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById('lblNombreUsuario').textContent = NOMBRE_USUARIO;
+            
+            // Si es admin, habilitamos el selector de filtros
+            if (ROL_USUARIO === 'admin') {
+                document.getElementById('filtroAdmin').style.display = 'block';
+            }
+
+            // Cargar datos por primera vez
+            cargarClientes();
+        });
+
+        async function cargarClientes(vendedorId = null) {
+            try {
+                // Si eres vendedor, el sistema te fuerza a ver solo tus clientes (ID_USUARIO)
+                let idFiltro = ROL_USUARIO === 'vendedor' ? ID_USUARIO : vendedorId;
+
+                const urlBase = `${API_URL}/api/clientes`;
+                const urlFinal = idFiltro ? `${urlBase}?vendedorId=${idFiltro}` : urlBase;
+
+                const response = await fetch(urlFinal);
+                const clientes = await response.json();
+                const tbody = document.getElementById('tablaClientes');
+
+                if (!clientes.length) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#64748b;">No hay clientes registrados.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = clientes.map(c => `
+                    <tr>
+                        <td style="font-weight: 600;">${c.nombre}</td>
+                        <td style="color: #a0aec0;">${c.ciudad || '---'}</td>
+                        <td style="color: #a0aec0;">${c.telefono_encargado || '---'}</td>
+                        <td>
+                            <span class="badge ${c.importancia ? c.importancia.toLowerCase() : 'baja'}">
+                                ${c.importancia || 'MEDIA'}
+                            </span>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error("Error al cargar clientes:", error);
+            }
+        }
+
+        // Evento cuando Ismael cambia el select
+        function filtrarPorVendedor() {
+            const idSeleccionado = document.getElementById('selectVendedor').value;
+            cargarClientes(idSeleccionado);
+        }
+
+        function cerrarSesion() {
+            localStorage.removeItem('usuarioCRM');
+            window.location.href = "/login";
+        }
+    </script>
+
+
+<!-- SCRIPT PROGRAMA COMPLETO -->
+
+
+</body>
+</html>

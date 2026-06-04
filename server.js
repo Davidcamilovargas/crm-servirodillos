@@ -23,6 +23,11 @@ app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'paginas', 'login.html'));
 });
 
+// Ruta para la pantalla de Clientes
+app.get('/clientes', (req, res) => {
+    res.sendFile(path.join(__dirname, 'paginas', 'clientes.html'));
+})
+
 // --- 🛠️ CONFIGURACIÓN DE LA BASE DE DATOS CON POOL INTELIGENTE ---
 // Usamos 'createPool' para que la conexión no se muera por inactividad por las mañanas
 const db = mysql.createPool({
@@ -180,6 +185,32 @@ app.get('/api/vendedores', (req, res) => {
         if (err) {
             console.error("❌ Error al traer vendedores:", err);
             return res.status(500).json({ error: "Error en el servidor" });
+        }
+        res.json(results);
+    });
+});
+
+// 🏢 ENDPOINT: OBTENER LISTA DE CLIENTES FILTRADA POR ROL
+// ==========================================
+app.get('/api/clientes', (req, res) => {
+    const { vendedorId } = req.query; // Captura el ID si viene desde el frontend
+
+    let query = 'SELECT * FROM clientes';
+    const queryParams = [];
+
+    // Si viene un vendedorId en la petición, filtramos la base de datos
+    if (vendedorId) {
+        query += ' WHERE vendedor_id = ?';
+        queryParams.push(vendedorId);
+    }
+
+    // Ordenamos alfabéticamente para que en los selects aparezcan organizados
+    query += ' ORDER BY nombre ASC';
+
+    db.query(query, queryParams, (err, results) => {
+        if (err) {
+            console.error('❌ Error al obtener clientes de la base de datos:', err);
+            return res.status(500).json({ error: 'Error interno del servidor al consultar clientes' });
         }
         res.json(results);
     });
