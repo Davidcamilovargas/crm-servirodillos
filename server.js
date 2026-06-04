@@ -190,6 +190,79 @@ app.get('/api/vendedores', (req, res) => {
     });
 });
 
+// ==========================================
+// 📊 ENDPOINTS REPORTE COMERCIAL MENSUAL
+// ==========================================
+
+// 1. REGISTRAR UN NUEVO PEDIDO
+app.post('/api/pedidos', async (req, res) => {
+    const { fecha, numero_pedido, cliente_nombre, estado, valor, vendedor_id } = req.body;
+    if (!fecha || !numero_pedido || !cliente_nombre || !valor || !vendedor_id) {
+        return res.status(400).json({ error: 'Faltan campos obligatorios.' });
+    }
+    try {
+        const query = `INSERT INTO pedidos (fecha, numero_pedido, cliente_nombre, estado, valor, vendedor_id) VALUES (?, ?, ?, ?, ?, ?)`;
+        const [result] = await db.query(query, [fecha, numero_pedido, cliente_nombre, estado || 'Pendiente', valor, vendedor_id]);
+        res.status(201).json({ message: 'Pedido registrado', id: result.insertId });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al guardar pedido' });
+    }
+});
+
+// 2. OBTENER PEDIDOS FILTRADOS POR MES, AÑO Y VENDEDOR + KPIs
+app.get('/api/pedidos', async (req, res) => {
+    const { vendedorId, mes, anio } = req.query; 
+    // Si el frontend no manda mes o año, tomamos el mes actual por defecto (Junio 2026)
+    const fechaActual = new Date();
+    const filtroMes = mes ? parseInt(mes) : (fechaActual.getMonth() + 1);
+    const filtroAnio = anio ? parseInt(anio) : fechaActual.getFullYear();
+
+    try {
+        // Filtramos usando MONTH(fecha) y YEAR(fecha) de MySQL
+        let query = `SELECT * FROM pedidos WHERE MONTH(fecha) = ? AND YEAR(fecha) = ?`;
+        let params = [filtroMes, filtroAnio];
+
+        if (vendedorId) {
+            query += ` AND vendedor_id = ?`;
+            params.push(vendedorId);
+        }
+
+        query += ` ORDER BY fecha DESC`;
+        const [pedidos] = await db.query(query, params);
+
+        // 🧮 Cálculos dinámicos del mes seleccionado
+        const totalVenta = pedidos.reduce((sum, p) => sum + parseFloat(p.valor), 0);
+        const META_MES = 15000000; // Meta de 15 millones (la puedes cambiar o hacer dinámica)
+        const restante = META_MES - totalVenta;
+
+        res.json({
+            pedidos,
+            kpis: { totalVenta, meta: META_MES, restante, mesFiltrado: filtroMes, anioFiltrado: filtroAnio }
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al cargar reporte mensual' });
+    }
+});
+
+// 3. EDITAR ESTADO DE UN PEDIDO (Pendiente <-> Entregado)
+app.put('/api/pedidos/:id', async (req, res) => {
+    const { id } = req.params;
+    const { estado } = req.body; // Recibe 'Pendiente' o 'Entregado'
+
+    if (!estado) return res.status(400).json({ error: 'El estado es requerido.' });
+
+    try {
+        const query = `UPDATE pedidos SET estado = ? WHERE id = ?`;
+        await db.query(query, [estado, id]);
+        res.json({ message: 'Pedido actualizado con éxito' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error al actualizar el estado del pedido' });
+    }
+});
+
 // 🏢 ENDPOINT: OBTENER LISTA DE CLIENTES FILTRADA POR ROL
 // ==========================================
 app.get('/api/clientes', (req, res) => {
