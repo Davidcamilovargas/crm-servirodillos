@@ -3,15 +3,415 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Servirodillos</title>
+<title>Servirodillos — Clientes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css">  
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
 
+/* ══════════════════════════════════════════
+   TOKENS — Servirodillos Brand
+   naranja #E8891A · verde lima #8DC63F
+   verde oscuro #2D5016 · negro #1A1A1A
+══════════════════════════════════════════ */
+:root {
+  --brand-orange:   #E8891A;
+  --brand-orange-h: #C4700E;
+  --brand-orange-l: #FDF0E0;
+  --brand-green:    #8DC63F;
+  --brand-green-d:  #2D5016;
+  --brand-green-l:  #EDF5D9;
+  --ink-1: #1A1A1A;
+  --ink-2: #444444;
+  --ink-3: #888888;
+  --ink-4: #BBBBBB;
+  --surface:   #FFFFFF;
+  --surface-2: #F7F6F3;
+  --surface-3: #F0EEE9;
+  --border:    #E2E0DA;
+  --border-2:  #CCC9C0;
+  --sidebar-bg: #141414;
+  --sidebar-w:  240px;
+  --radius:     10px;
+  --radius-sm:  7px;
+  --shadow-card: 0 1px 4px rgba(0,0,0,.07);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Barlow', sans-serif;
+  font-size: 14px;
+  color: var(--ink-1);
+  background: var(--surface-3);
+  display: flex;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── SIDEBAR ──────────────────────────── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  transition: transform .28s ease;
+}
+
+.sidebar-logo {
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.sidebar-logo::before {
+  content: '⚙';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; height: 40px;
+  background: var(--brand-green-d);
+  border: 2px solid var(--brand-green);
+  border-radius: 50%;
+  font-size: 20px;
+  flex-shrink: 0;
+  color: var(--brand-green);
+}
+
+.logo-word {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 19px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--brand-orange);
+  line-height: 1;
+}
+.logo-word span { color: #fff; }
+
+.logo-sub {
+  font-size: 10px;
+  color: rgba(255,255,255,.35);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-top: 2px;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 10px 0;
+  overflow-y: auto;
+}
+
+.nav-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,.25);
+  padding: 14px 18px 5px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,.5);
+  text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all .15s;
+  cursor: pointer;
+}
+.nav-item:hover {
+  color: #fff;
+  background: rgba(255,255,255,.05);
+}
+.nav-item.active {
+  color: var(--brand-orange);
+  border-left-color: var(--brand-orange);
+  background: rgba(232,137,26,.1);
+}
+.nav-icon { font-size: 14px; opacity: .7; width: 18px; text-align: center; }
+
+.sidebar-user {
+  padding: 12px 18px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.user-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--brand-orange-h);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.user-name { font-size: 13px; font-weight: 600; color: #fff; }
+.user-role { font-size: 11px; color: rgba(255,255,255,.35); }
+
+.sidebar-footer {
+  padding: 10px 18px 16px;
+}
+.btn-logout {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1);
+  color: rgba(255,255,255,.5);
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  padding: 9px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all .15s;
+}
+.btn-logout:hover {
+  background: rgba(220,50,50,.15);
+  border-color: rgba(220,50,50,.4);
+  color: #ff6b6b;
+}
+
+/* ─── HAMBURGER ────────────────────────── */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 13px; left: 13px;
+  z-index: 200;
+  background: var(--brand-orange);
+  border: none;
+  border-radius: var(--radius-sm);
+  width: 40px; height: 40px;
+  cursor: pointer;
+  align-items: center; justify-content: center;
+  flex-direction: column; gap: 5px;
+}
+.hamburger span {
+  display: block; width: 20px; height: 2px;
+  background: #fff; border-radius: 2px;
+}
+.overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 99;
+}
+
+/* ─── MAIN CONTENT ─────────────────────── */
+.main-content {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Topbar de página */
+.page-topbar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  box-shadow: var(--shadow-card);
+}
+.page-topbar h1 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 22px;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: var(--ink-1);
+}
+.page-topbar-sub { font-size: 12px; color: var(--ink-3); margin-top: 1px; }
+
+/* ─── CARD GLASS → mismo look que .panel ── */
+.card-glass {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+/* ─── HEADER SECCIÓN ───────────────────── */
+.header-seccion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.header-seccion h2 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: var(--ink-1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ─── FILTER BOX ───────────────────────── */
+.filter-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.filter-box label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--ink-3);
+}
+.filter-box select {
+  background: var(--surface);
+  border: 1px solid var(--border-2);
+  color: var(--ink-1);
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  border-radius: var(--radius-sm);
+  padding: 7px 12px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
+}
+.filter-box select:focus {
+  border-color: var(--brand-orange);
+  box-shadow: 0 0 0 3px rgba(232,137,26,.12);
+}
+
+/* ─── TABLE ────────────────────────────── */
+.table-wrap { overflow-x: auto; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+
+thead tr { background: var(--surface-2); }
+th {
+  padding: 11px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink-1);
+  vertical-align: middle;
+}
+tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--surface-2); }
+tr.empty-row td,
+td[colspan] {
+  text-align: center;
+  color: var(--ink-3);
+  padding: 36px;
+  font-style: italic;
+}
+
+/* ─── BADGES importancia ───────────────── */
+.badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.badge.alta   { background: #FDE8E8; color: #B91C1C; border: 1px solid rgba(185,28,28,.2); }
+.badge.media  { background: var(--brand-orange-l); color: var(--brand-orange-h); border: 1px solid rgba(232,137,26,.25); }
+.badge.baja   { background: var(--brand-green-l);  color: var(--brand-green-d);  border: 1px solid rgba(141,198,63,.3); }
+
+/* ─── TOAST ────────────────────────────── */
+#toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  background: var(--ink-1);
+  color: #fff;
+  font-size: 13px; font-weight: 600;
+  padding: 12px 20px;
+  border-radius: var(--radius);
+  border-left: 4px solid var(--brand-green);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .28s, transform .28s;
+  pointer-events: none;
+  z-index: 999;
+  max-width: 320px;
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+
+/* ─── RESPONSIVE ───────────────────────── */
+@media (max-width: 720px) {
+  :root { --sidebar-w: 0px; }
+
+  .sidebar {
+    width: 240px;
+    transform: translateX(-240px);
+  }
+  .sidebar.open { transform: translateX(0); }
+
+  .hamburger { display: flex; }
+  .overlay.show { display: block; }
+
+  .main-content {
+    margin-left: 0;
+    padding: 16px;
+    padding-top: 64px;
+  }
+
+  .header-seccion {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  th, td { padding: 10px 12px; }
+
+  .filter-box { width: 100%; }
+  .filter-box select { width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .header-seccion h2 { font-size: 15px; }
+  td, th { font-size: 12px; }
+}
+</style>
 </head>
 <body>
-
 
 <!-- Hamburger (móvil) -->
 <button class="hamburger" id="hamburger" aria-label="Menú">
@@ -29,10 +429,10 @@
   </div>
   <nav class="sidebar-nav">
     <div class="nav-label">Principal</div>
-    <a class="nav-item active" href="/">
+    <a class="nav-item" href="/">
       <span class="nav-icon">⬛</span> Panel
     </a>
-    <a class="nav-item" href="/clientes">
+    <a class="nav-item active" href="/clientes">
       <span class="nav-icon">◎</span> Clientes
     </a>
     <a class="nav-item" href="/paginas/oportunidades.html">
@@ -53,8 +453,9 @@
       <span class="nav-icon">⊙</span> Configuración
     </a>
   </nav>
-<div class="sidebar-user">
-    <div class="user-avatar" id="avatarIniciales">👤</div> 
+
+  <div class="sidebar-user">
+    <div class="user-avatar" id="avatarIniciales">👤</div>
     <div class="user-info">
       <div class="user-name" id="lblNombreUsuario">Cargando...</div>
       <div class="user-role" id="lblRolUsuario" style="text-transform: capitalize;">...</div>
@@ -62,277 +463,140 @@
   </div>
 
   <div class="sidebar-footer">
-        <button onclick="cerrarSesion()" class="btn-logout">
-            <i class="fa-solid fa-right-from-bracket"></i>
-            <span>Cerrar Sesión</span>
-        </button>
-    </div>
+    <button onclick="cerrarSesion()" class="btn-logout">
+      <i class="fa-solid fa-right-from-bracket"></i>
+      <span>Cerrar Sesión</span>
+    </button>
+  </div>
 </aside>
 
-
-</head>
-
 <!-- MAIN -->
-<style>
-        /* --- ESTILOS CYBERPUNK / GLASSMORPHISM REUTILIZADOS --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', sans-serif;
-        }
+<main class="main-content">
+  <div class="card-glass">
+    <div class="header-seccion">
+      <h2>👥 Base de Datos de Clientes</h2>
 
-        body {
-            background: #0f1015;
-            color: #ffffff;
-            min-height: 100vh;
-            display: flex;
-        }
+      <div class="filter-box" id="filtroAdmin" style="display: none;">
+        <label>Vendedor:</label>
+        <select id="selectVendedor" onchange="filtrarPorVendedor()">
+          <option value="">Todos los clientes</option>
+          <option value="2">David Vargas</option>
+          <option value="1">Ismael</option>
+        </select>
+      </div>
+    </div>
 
-        /* Estructura básica de dos columnas (Sidebar fija + Contenido) */
-        .sidebar {
-            width: 260px;
-            background: rgba(255, 255, 255, 0.02);
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-        }
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Empresa</th>
+            <th>Ciudad</th>
+            <th>Teléfono Encargado</th>
+            <th>Importancia</th>
+          </tr>
+        </thead>
+        <tbody id="tablaClientes">
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
 
-        .main-content {
-            flex: 1;
-            padding: 40px;
-            overflow-y: auto;
-        }
-
-        .card-glass {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
-
-        .header-seccion {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        h2 {
-            font-size: 1.8rem;
-            letter-spacing: 0.5px;
-        }
-
-        /* Selector de Filtros estilo Cyberpunk */
-        .filter-box select {
-            background: #1a1c24;
-            color: #fff;
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.1);
-            outline: none;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
-        .filter-box select:focus {
-            border-color: #8a2be2;
-            box-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
-        }
-
-        /* Tabla de Clientes */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        th {
-            background: rgba(138, 43, 226, 0.1);
-            color: #a0aec0;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        td {
-            padding: 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.03);
-            font-size: 0.95rem;
-        }
-
-        tr:hover td {
-            background: rgba(255, 255, 255, 0.01);
-        }
-
-        /* Chips de Importancia */
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-        .alta { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
-        .media { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
-        .baja { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
-
-        /* Links de navegación */
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: #8a92a6;
-            text-decoration: none;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        .nav-item.active, .nav-item:hover {
-            color: #fff;
-            background: rgba(255,255,255,0.05);
-        }
-    </style>
-
-
-<body>
-
-    <aside class="sidebar">
-        <h2 style="font-size: 1.2rem; color: #00ff88; margin-bottom: 30px;"><i class="fa-solid fa-gears"></i> SERVIRODILLOS</h2>
-        <nav>
-            <a href="/" class="nav-item"><i class="fa-solid fa-chart-line"></i> Panel</a>
-            <a href="/clientes" class="nav-item active"><i class="fa-solid fa-users"></i> Clientes</a>
-        </nav>
-        
-        <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
-            <p style="font-size: 0.85rem; color: #a0aec0; margin-bottom: 10px;">👤 <span id="lblNombreUsuario">...</span></p>
-            <button onclick="cerrarSesion()" style="background: #ff4444; color: white; border: none; padding: 8px; border-radius: 6px; width: 100%; cursor: pointer;">Cerrar Sesión</button>
-        </div>
-    </aside>
-
-    <main class="main-content">
-        <div class="card-glass">
-            <div class="header-seccion">
-                <h2>👥 Base de Datos de Clientes</h2>
-                
-                <div class="filter-box" id="filtroAdmin" style="display: none;">
-                    <label style="color: #a0aec0; margin-right: 10px; font-size: 0.9rem;">Vendedor:</label>
-                    <select id="selectVendedor" onchange="filtrarPorVendedor()">
-                        <option value="">Todos los clientes</option>
-                        <option value="2">David Vargas</option>
-                        <option value="1">Ismael</option>
-                    </select>
-                </div>
-            </div>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Empresa</th>
-                        <th>Ciudad</th>
-                        <th>Teléfono Encargado</th>
-                        <th>Importancia</th>
-                    </tr>
-                </thead>
-                <tbody id="tablaClientes">
-                    </tbody>
-            </table>
-        </div>
-    </main>
 <div id="toast"></div>
 
-    <script>
-        // 🔒 SEGURIDAD: Validar sesión
-        const usuarioSesion = JSON.parse(localStorage.getItem('usuarioCRM'));
-        if (!usuarioSesion) window.location.href = "/login";
+<script>
+  // 🔒 SEGURIDAD: Validar sesión
+  const usuarioSesion = JSON.parse(localStorage.getItem('usuarioCRM'));
+  if (!usuarioSesion) window.location.href = "/login";
 
-        const ROL_USUARIO = usuarioSesion.rol;
-        const ID_USUARIO = usuarioSesion.id;
-        const NOMBRE_USUARIO = usuarioSesion.nombre;
+  const ROL_USUARIO    = usuarioSesion.rol;
+  const ID_USUARIO     = usuarioSesion.id;
+  const NOMBRE_USUARIO = usuarioSesion.nombre;
 
-        const API_URL = "https://crm-servirodillos.onrender.com";
+  const API_URL = "https://crm-servirodillos.onrender.com";
 
-        document.addEventListener("DOMContentLoaded", () => {
-            // Dentro de document.addEventListener("DOMContentLoaded", () => { ...
-document.getElementById('lblNombreUsuario').textContent = NOMBRE_USUARIO;
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById('lblNombreUsuario').textContent = NOMBRE_USUARIO;
 
-// 🌟 EXTRA: Pintar el rol real en la interfaz
-if (document.getElementById('lblRolUsuario')) {
-    document.getElementById('lblRolUsuario').textContent = ROL_USUARIO;
-}
+    if (document.getElementById('lblRolUsuario')) {
+      document.getElementById('lblRolUsuario').textContent = ROL_USUARIO;
+    }
+    if (document.getElementById('avatarIniciales')) {
+      document.getElementById('avatarIniciales').textContent = NOMBRE_USUARIO.slice(0, 2).toUpperCase();
+    }
 
-// 🌟 EXTRA: Poner las 2 primeras letras de tu nombre como avatar
-if (document.getElementById('avatarIniciales')) {
-    document.getElementById('avatarIniciales').textContent = NOMBRE_USUARIO.slice(0, 2).toUpperCase();
-}
-            document.getElementById('lblNombreUsuario').textContent = NOMBRE_USUARIO;
-            
-            // Si es admin, habilitamos el selector de filtros
-            if (ROL_USUARIO === 'admin') {
-                document.getElementById('filtroAdmin').style.display = 'block';
-            }
+    if (ROL_USUARIO === 'admin') {
+      document.getElementById('filtroAdmin').style.display = 'flex';
+    }
 
-            // Cargar datos por primera vez
-            cargarClientes();
-        });
+    cargarClientes();
+  });
 
-        async function cargarClientes(vendedorId = null) {
-            try {
-                // Si eres vendedor, el sistema te fuerza a ver solo tus clientes (ID_USUARIO)
-                let idFiltro = ROL_USUARIO === 'vendedor' ? ID_USUARIO : vendedorId;
+  async function cargarClientes(vendedorId = null) {
+    try {
+      let idFiltro = ROL_USUARIO === 'vendedor' ? ID_USUARIO : vendedorId;
+      const urlBase  = `${API_URL}/api/clientes`;
+      const urlFinal = idFiltro ? `${urlBase}?vendedorId=${idFiltro}` : urlBase;
 
-                const urlBase = `${API_URL}/api/clientes`;
-                const urlFinal = idFiltro ? `${urlBase}?vendedorId=${idFiltro}` : urlBase;
+      const response = await fetch(urlFinal);
+      const clientes = await response.json();
+      const tbody    = document.getElementById('tablaClientes');
 
-                const response = await fetch(urlFinal);
-                const clientes = await response.json();
-                const tbody = document.getElementById('tablaClientes');
+      if (!clientes.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--ink-3); padding:36px; font-style:italic;">No hay clientes registrados.</td></tr>';
+        return;
+      }
 
-                if (!clientes.length) {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#64748b;">No hay clientes registrados.</td></tr>';
-                    return;
-                }
+      tbody.innerHTML = clientes.map(c => `
+        <tr>
+          <td style="font-weight:600;">${c.nombre}</td>
+          <td style="color:var(--ink-3);">${c.ciudad || '—'}</td>
+          <td style="color:var(--ink-3);">${c.telefono_encargado || '—'}</td>
+          <td>
+            <span class="badge ${c.importancia ? c.importancia.toLowerCase() : 'baja'}">
+              ${c.importancia || 'MEDIA'}
+            </span>
+          </td>
+        </tr>
+      `).join('');
 
-                tbody.innerHTML = clientes.map(c => `
-                    <tr>
-                        <td style="font-weight: 600;">${c.nombre}</td>
-                        <td style="color: #a0aec0;">${c.ciudad || '---'}</td>
-                        <td style="color: #a0aec0;">${c.telefono_encargado || '---'}</td>
-                        <td>
-                            <span class="badge ${c.importancia ? c.importancia.toLowerCase() : 'baja'}">
-                                ${c.importancia || 'MEDIA'}
-                            </span>
-                        </td>
-                    </tr>
-                `).join('');
+    } catch (error) {
+      console.error("Error al cargar clientes:", error);
+    }
+  }
 
-            } catch (error) {
-                console.error("Error al cargar clientes:", error);
-            }
-        }
+  function filtrarPorVendedor() {
+    const idSeleccionado = document.getElementById('selectVendedor').value;
+    cargarClientes(idSeleccionado);
+  }
 
-        // Evento cuando Ismael cambia el select
-        function filtrarPorVendedor() {
-            const idSeleccionado = document.getElementById('selectVendedor').value;
-            cargarClientes(idSeleccionado);
-        }
+  function cerrarSesion() {
+    localStorage.removeItem('usuarioCRM');
+    window.location.href = "/login";
+  }
 
-        function cerrarSesion() {
-            localStorage.removeItem('usuarioCRM');
-            window.location.href = "/login";
-        }
-    </script>
+  // Hamburger / overlay móvil
+  const sidebar   = document.getElementById('sidebar');
+  const hamburger = document.getElementById('hamburger');
+  const overlay   = document.getElementById('overlay');
 
-
-<!-- SCRIPT PROGRAMA COMPLETO -->
-
-
+  hamburger.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('show');
+  });
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('show');
+  });
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.addEventListener('click', () => {
+      if (window.innerWidth <= 720) {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('show');
+      }
+    });
+  });
+</script>
 </body>
 </html>
