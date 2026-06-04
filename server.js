@@ -10,37 +10,30 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Sirve todos los archivos de tu carpeta (CSS, JS del cliente, imágenes)
 app.use(express.static(__dirname));
-
-// Aseguramos la ruta del CSS para evitar bloqueos de tipo MIME en subcarpetas virtuales
 app.use('/css', express.static(path.join(__dirname, 'css')));
 
-// Ruta para enviar el HTML principal al entrar a la raíz "/"
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html')); 
 });
 
-// 🌟 NUEVA RUTA: Apunta directamente a tu carpeta 'paginas'
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'paginas', 'login.html'));
 });
 
-// Ruta para la pantalla de Clientes
 app.get('/clientes', (req, res) => {
     res.sendFile(path.join(__dirname, 'paginas', 'clientes.html'));
 });
 
-// Ruta para la pantalla de Reporte
 app.get('/reporte', (req, res) => {
     res.sendFile(path.join(__dirname, 'paginas', 'reporte.html'));
 });
 
-// --- 🛠️ CONFIGURACIÓN DE LA BASE DE DATOS CON POOL INTELIGENTE ---
+// --- CONFIGURACIÓN DE LA BASE DE DATOS ---
 const db = mysql.createPool({
     host: process.env.DB_HOST || "mysql-2d9ef1b2-davidleon1004-b427.l.aivencloud.com",
     user: process.env.DB_USER || "avnadmin",
-    password: process.env.DB_PASSWORD || "TU_CONTRASEÑA_DE_AIVEN", // Recuerda poner tu clave real aquí
+    password: process.env.DB_PASSWORD || "TU_CONTRASEÑA_DE_AIVEN",
     database: process.env.DB_NAME || "defaultdb",
     port: process.env.DB_PORT || 12345,
     waitForConnections: true,
@@ -52,7 +45,7 @@ const db = mysql.createPool({
 });
 
 
-// --- 🔒 RUTA: INICIO DE SESIÓN (POST) ---
+// --- RUTA: INICIO DE SESIÓN (POST) ---
 app.post('/api/login', (req, res) => {
     const { email, password } = req.body;
 
@@ -75,20 +68,21 @@ app.post('/api/login', (req, res) => {
         const usuario = results[0];
         console.log(`🔑 Sesión iniciada para: ${usuario.nombre} (Rol: ${usuario.rol})`);
         
+        // ✅ FIX: Se usa "rol" (español) para que sea consistente con todo el frontend
         res.json({
             mensaje: "Inicio de sesión exitoso",
             usuario: {
                 id: usuario.id,
                 nombre: usuario.nombre,
                 email: usuario.email,
-                rol: usuario.rol  
+                rol: usuario.rol   // ← CORREGIDO: era "role", ahora es "rol"
             }
         });
     });
 });
 
 
-// --- 📊 RUTA: VER BALANCE (GET) ---
+// --- RUTA: VER BALANCE (GET) ---
 app.get('/api/balance', (req, res) => {
     const { vendedorId } = req.query; 
 
@@ -126,7 +120,7 @@ app.get('/api/balance', (req, res) => {
 });
 
 
-// --- 📜 RUTA: VER HISTORIAL (GET) ---
+// --- RUTA: VER HISTORIAL (GET) ---
 app.get('/api/historial', (req, res) => {
     const { vendedorId } = req.query;
 
@@ -152,7 +146,7 @@ app.get('/api/historial', (req, res) => {
 });
 
 
-// --- 🚀 RUTA: REGISTRAR UNA ACTIVIDAD (POST) ---
+// --- RUTA: REGISTRAR UNA ACTIVIDAD (POST) ---
 app.post('/api/registrar', (req, res) => {
     let { vendedor, cliente, tipoActividad, notas } = req.body; 
 
@@ -170,7 +164,7 @@ app.post('/api/registrar', (req, res) => {
             return res.status(500).json({ error: err.message });
         }
 
-        console.log(`✅ ¡Actividad guardada en MySQL para el vendedor ID: ${vendedor}!`);
+        console.log(`✅ Actividad guardada para el vendedor ID: ${vendedor}`);
 
         res.json({
             mensaje: "¡Actividad registrada y guardada permanentemente en MySQL!",
@@ -180,7 +174,7 @@ app.post('/api/registrar', (req, res) => {
 });
 
 
-// --- 👥 RUTA: LISTAR VENDEDORES (GET) ---
+// --- RUTA: LISTAR VENDEDORES (GET) ---
 app.get('/api/vendedores', (req, res) => {
     const sql = "SELECT id, nombre FROM vendedores ORDER BY nombre ASC";
     db.query(sql, (err, results) => {
@@ -193,9 +187,7 @@ app.get('/api/vendedores', (req, res) => {
 });
 
 
-// ==========================================
-// 📊 ENDPOINTS REPORTE COMERCIAL MENSUAL (CON CALLBACKS)
-// ==========================================
+// --- ENDPOINTS REPORTE COMERCIAL MENSUAL ---
 
 // 1. REGISTRAR UN NUEVO PEDIDO
 app.post('/api/pedidos', (req, res) => {
@@ -216,7 +208,7 @@ app.post('/api/pedidos', (req, res) => {
     });
 });
 
-// 2. OBTENER PEDIDOS FILTRADOS POR MES, AÑO Y VENDEDOR + KPIs (CORREGIDO)
+// 2. OBTENER PEDIDOS FILTRADOS POR MES, AÑO Y VENDEDOR + KPIs
 app.get('/api/pedidos', (req, res) => {
     const { vendedorId, mes, anio } = req.query; 
     
@@ -230,7 +222,6 @@ app.get('/api/pedidos', (req, res) => {
     let query = `SELECT * FROM pedidos WHERE fecha BETWEEN ? AND ?`;
     let params = [fechaInicio, fechaFin];
 
-    // Validación inteligente para discriminar "todos", nulos o indefinidos
     if (vendedorId && vendedorId !== 'todos' && vendedorId !== 'null' && vendedorId !== 'undefined') {
         query += ` AND vendedor_id = ?`;
         params.push(vendedorId);
@@ -240,11 +231,10 @@ app.get('/api/pedidos', (req, res) => {
 
     db.query(query, params, (err, pedidos) => {
         if (err) {
-            console.error('❌ Error en el servidor de base de datos:', err);
+            console.error('❌ Error en la base de datos:', err);
             return res.status(500).json({ error: 'Error interno al cargar el reporte comercial', detalle: err.message });
         }
 
-        // Calculamos los totales recorriendo el array de forma segura
         const totalVenta = pedidos.reduce((sum, p) => sum + parseFloat(p.valor || 0), 0);
         const META_MES = 15000000; 
         const restante = META_MES - totalVenta;
@@ -256,7 +246,7 @@ app.get('/api/pedidos', (req, res) => {
     });
 });
 
-// 3. EDITAR ESTADO DE UN PEDIDO (Pendiente <-> Entregado)
+// 3. EDITAR ESTADO DE UN PEDIDO
 app.put('/api/pedidos/:id', (req, res) => {
     const { id } = req.params;
     const { estado } = req.body;
@@ -275,8 +265,7 @@ app.put('/api/pedidos/:id', (req, res) => {
 });
 
 
-// 🏢 ENDPOINT: OBTENER LISTA DE CLIENTES FILTRADA POR ROL
-// ==========================================
+// --- RUTA: OBTENER LISTA DE CLIENTES ---
 app.get('/api/clientes', (req, res) => {
     const { vendedorId } = req.query; 
 
@@ -292,7 +281,7 @@ app.get('/api/clientes', (req, res) => {
 
     db.query(query, queryParams, (err, results) => {
         if (err) {
-            console.error('❌ Error al obtener clientes de la base de datos:', err);
+            console.error('❌ Error al obtener clientes:', err);
             return res.status(500).json({ error: 'Error interno del servidor al consultar clientes' });
         }
         res.json(results);

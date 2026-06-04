@@ -10,11 +10,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 
-/* ══════════════════════════════════════════
-   TOKENS — Servirodillos Brand
-   naranja #E8891A · verde lima #8DC63F
-   verde oscuro #2D5016 · negro #1A1A1A
-══════════════════════════════════════════ */
 :root {
   --brand-orange:   #E8891A;
   --brand-orange-h: #C4700E;
@@ -50,7 +45,7 @@ body {
   overflow-x: hidden;
 }
 
-/* ─── SIDEBAR ──────────────────────────── */
+/* ─── SIDEBAR ─────────────────────────── */
 .sidebar {
   width: var(--sidebar-w);
   background: var(--sidebar-bg);
@@ -222,30 +217,6 @@ body {
   gap: 20px;
 }
 
-/* Topbar de página */
-.page-topbar {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px 22px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  box-shadow: var(--shadow-card);
-}
-.page-topbar h1 {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 900;
-  font-size: 22px;
-  text-transform: uppercase;
-  letter-spacing: .8px;
-  color: var(--ink-1);
-}
-.page-topbar-sub { font-size: 12px; color: var(--ink-3); margin-top: 1px; }
-
-/* ─── CARD GLASS → mismo look que .panel ── */
 .card-glass {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -254,7 +225,6 @@ body {
   box-shadow: var(--shadow-card);
 }
 
-/* ─── HEADER SECCIÓN ───────────────────── */
 .header-seccion {
   display: flex;
   align-items: center;
@@ -334,15 +304,8 @@ td {
 }
 tr:last-child td { border-bottom: none; }
 tbody tr:hover td { background: var(--surface-2); }
-tr.empty-row td,
-td[colspan] {
-  text-align: center;
-  color: var(--ink-3);
-  padding: 36px;
-  font-style: italic;
-}
 
-/* ─── BADGES importancia ───────────────── */
+/* ─── BADGES ───────────────────────────── */
 .badge {
   display: inline-block;
   font-size: 10px;
@@ -414,7 +377,6 @@ td[colspan] {
 
 <body>
 
-<!-- Hamburger (móvil) -->
 <button class="hamburger" id="hamburger" aria-label="Menú">
   <span></span><span></span><span></span>
 </button>
@@ -437,7 +399,7 @@ td[colspan] {
       <span class="nav-icon">◎</span> Clientes
     </a>
     <a class="nav-item" href="/reporte">
-      <span class="nav-icon">◈</span> Reporte
+      <span class="nav-icon">◈</span> Reporte Comercial
     </a>
     <div class="nav-label">Reportes</div>
     <a class="nav-item" href="#">
@@ -455,7 +417,8 @@ td[colspan] {
     </a>
   </nav>
 
-  <div class="sidebar-user">    <div class="user-avatar" id="avatarIniciales">👤</div>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="avatarIniciales">👤</div>
     <div class="user-info">
       <div class="user-name" id="lblNombreUsuario">Cargando...</div>
       <div class="user-role" id="lblRolUsuario" style="text-transform: capitalize;">...</div>
@@ -468,7 +431,7 @@ td[colspan] {
       <span>Cerrar Sesión</span>
     </button>
   </div>
-    </aside>
+</aside>
 
 <!-- MAIN -->
 <main class="main-content">
@@ -476,11 +439,12 @@ td[colspan] {
     <div class="header-seccion">
       <h2>👥 Base de Datos de Clientes</h2>
 
-<div class="filter-box" style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
-    
-    <div id="filtroCiudad" style="display: flex; align-items: center;">
-        <label style="color: #a0aec0; margin-right: 10px; font-size: 0.9rem;">Ciudad:</label>
-        <select id="selectCiudad" onchange="filtrarClientesPorCiudad()" style="background: #1a1c24; color: #fff; padding: 10px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); outline: none; cursor: pointer;">
+      <div class="filter-box">
+
+        <!-- Filtro ciudad: visible para todos -->
+        <div id="filtroCiudad" style="display: flex; align-items: center; gap: 8px;">
+          <label>Ciudad:</label>
+          <select id="selectCiudad" onchange="filtrarClientesPorCiudad()">
             <option value="">Todas las ciudades</option>
             <option value="ARMENIA">Armenia</option>
             <option value="DOS QUEBRADAS">Dos Quebradas</option>
@@ -489,19 +453,20 @@ td[colspan] {
             <option value="ITAGÜÍ">Itagüí</option>
             <option value="MEDELLIN">Medellín</option>
             <option value="SABANETA">Sabaneta</option>
-        </select>
-    </div>
+          </select>
+        </div>
 
-    <div id="filtroAdmin" style="display: none; align-items: center;">
-        <label style="color: #a0aec0; margin-right: 10px; font-size: 0.9rem;">Vendedor:</label>
-        <select id="selectVendedor" onchange="filtrarPorVendedor()" style="background: #1a1c24; color: #fff; padding: 10px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); outline: none; cursor: pointer;">
+        <!-- Filtro vendedor: solo visible para admin (se muestra con JS) -->
+        <div id="filtroAdmin" style="display: none; align-items: center; gap: 8px;">
+          <label>Vendedor:</label>
+          <select id="selectVendedor" onchange="filtrarPorVendedor()">
             <option value="">Todos los clientes</option>
             <option value="2">David Vargas</option>
             <option value="1">Ismael Vargas</option>
-        </select>
-    </div>
+          </select>
+        </div>
 
-</div>
+      </div>
     </div>
 
     <div class="table-wrap">
@@ -524,29 +489,36 @@ td[colspan] {
 <div id="toast"></div>
 
 <script>
-  // 🔒 SEGURIDAD: Validar sesión
+  // ✅ FIX: Leer sesión desde el objeto completo 'usuarioCRM'
   const usuarioSesion = JSON.parse(localStorage.getItem('usuarioCRM'));
+
+  // 🔒 Redirigir si no hay sesión activa
   if (!usuarioSesion) window.location.href = "/login";
 
-  const ROL_USUARIO    = usuarioSesion.rol;
+  const ROL_USUARIO    = usuarioSesion.rol;     // ← lee "rol" del objeto guardado
   const ID_USUARIO     = usuarioSesion.id;
   const NOMBRE_USUARIO = usuarioSesion.nombre;
 
   const API_URL = "https://crm-servirodillos.onrender.com";
 
-  // 🌟 VARIABLE GLOBAL: Guarda los clientes descargados para poder filtrarlos localmente por ciudad
+  // Variable global para filtrado local por ciudad
   let listaClientesGlobal = [];
 
   document.addEventListener("DOMContentLoaded", () => {
+
+    // Pintar datos del usuario en el sidebar
     document.getElementById('lblNombreUsuario').textContent = NOMBRE_USUARIO;
 
     if (document.getElementById('lblRolUsuario')) {
-      document.getElementById('lblRolUsuario').textContent = ROL_USUARIO;
+      document.getElementById('lblRolUsuario').textContent =
+        ROL_USUARIO === 'admin' ? 'Administrador' : 'Asesor Comercial';
     }
     if (document.getElementById('avatarIniciales')) {
-      document.getElementById('avatarIniciales').textContent = NOMBRE_USUARIO.slice(0, 2).toUpperCase();
+      document.getElementById('avatarIniciales').textContent =
+        NOMBRE_USUARIO.slice(0, 2).toUpperCase();
     }
 
+    // ✅ FIX: Mostrar filtro de vendedor solo si es admin
     if (ROL_USUARIO === 'admin') {
       document.getElementById('filtroAdmin').style.display = 'flex';
     }
@@ -556,20 +528,20 @@ td[colspan] {
 
   async function cargarClientes(vendedorId = null) {
     try {
+      // Si es vendedor, siempre filtra por su propio ID
+      // Si es admin, filtra por el vendedor seleccionado (o trae todos si es null)
       let idFiltro = ROL_USUARIO === 'vendedor' ? ID_USUARIO : vendedorId;
+
       const urlBase  = `${API_URL}/api/clientes`;
       const urlFinal = idFiltro ? `${urlBase}?vendedorId=${idFiltro}` : urlBase;
 
       const response = await fetch(urlFinal);
-      
-      // 🌟 CAMBIO: Almacenamos la respuesta en la lista global en vez de mapearla directo
       listaClientesGlobal = await response.json();
 
-      // 🌟 Limpiamos el filtro de ciudad cada vez que se descarguen datos nuevos de la API
+      // Limpiar filtro de ciudad al recargar datos
       const selectCiudad = document.getElementById('selectCiudad');
       if (selectCiudad) selectCiudad.value = "";
 
-      // Dibujamos la tabla con todos los clientes cargados
       dibujarTabla(listaClientesGlobal);
 
     } catch (error) {
@@ -577,13 +549,12 @@ td[colspan] {
     }
   }
 
-  // 🌟 NUEVA FUNCIÓN: Se encarga exclusivamente de pintar el HTML en el tbody
   function dibujarTabla(clientes) {
     const tbody = document.getElementById('tablaClientes');
     if (!tbody) return;
 
     if (!clientes.length) {
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--ink-3); padding:36px; font-style:italic;">No se encontraron clientes.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--ink-3);padding:36px;font-style:italic;">No se encontraron clientes.</td></tr>';
       return;
     }
 
@@ -601,33 +572,29 @@ td[colspan] {
     `).join('');
   }
 
-  // 🌟 NUEVA FUNCIÓN: Filtra en tiempo real los datos cargados usando el select de ciudad
+  // Filtrado local por ciudad
   function filtrarClientesPorCiudad() {
     const ciudadSeleccionada = document.getElementById('selectCiudad').value;
-    
-    // Si no hay ciudad seleccionada, pintamos toda la lista global otra vez
+
     if (!ciudadSeleccionada) {
       dibujarTabla(listaClientesGlobal);
       return;
     }
 
-    // Filtramos localmente comparando strings de forma limpia
     const clientesFiltrados = listaClientesGlobal.filter(c => {
       if (!c.ciudad) return false;
-      
-      // Normalizamos ambos textos (Pasar a MAYÚSCULAS y remover tildes/espacios raros)
       const ciudadCliente = c.ciudad.toUpperCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      const ciudadFiltro = ciudadSeleccionada.toUpperCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      
+      const ciudadFiltro  = ciudadSeleccionada.toUpperCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
       return ciudadCliente === ciudadFiltro;
     });
 
     dibujarTabla(clientesFiltrados);
   }
 
+  // El admin filtra por vendedor → recarga desde la API
   function filtrarPorVendedor() {
     const idSeleccionado = document.getElementById('selectVendedor').value;
-    cargarClientes(idSeleccionado);
+    cargarClientes(idSeleccionado || null);
   }
 
   function cerrarSesion() {

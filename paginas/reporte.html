@@ -10,14 +10,12 @@
   <link rel="stylesheet" href="/styles.css">
 
   <style>
-  /* ── Estilos específicos de esta página ── */
   :root {
     --pendiente-color: #E8891A;
     --entregado-color: #8DC63F;
     --text-muted: #888;
   }
 
-  /* LAYOUT CON SIDEBAR */
   .main-content {
     margin-left: var(--sidebar-w);
     flex: 1;
@@ -25,7 +23,6 @@
     padding: 28px;
   }
 
-  /* HEADER DEL REPORTE */
   .reporte-header {
     display: flex;
     justify-content: space-between;
@@ -50,7 +47,6 @@
     font-weight: 500;
   }
 
-  /* FILTRO VENDEDOR ADMIN */
   #contenedorFiltroVendedor {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -70,7 +66,6 @@
     white-space: nowrap;
   }
 
-  /* CONTROL BAR */
   .control-bar {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -93,7 +88,6 @@
   }
   .control-bar > div { display: flex; align-items: center; }
 
-  /* KPI CARDS */
   .kpi-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -136,7 +130,6 @@
     color: var(--ink-1);
   }
 
-  /* PANEL TABLA */
   .panel-tabla {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -146,14 +139,12 @@
     margin-bottom: 22px;
   }
 
-  /* ESTADOS DE FILA */
   .row-pendiente { border-left: 3px solid var(--brand-orange); }
   .row-entregado {
     border-left: 3px solid var(--brand-green);
     background: rgba(141,198,63,.03);
   }
 
-  /* BADGES ESTADO */
   .badge-pendiente {
     display: inline-flex; align-items: center;
     font-size: 11px; font-weight: 700;
@@ -171,7 +162,6 @@
     color: var(--brand-green-d);
   }
 
-  /* BOTÓN AGREGAR */
   .btn-agregar {
     margin-left: auto;
     background: var(--brand-orange) !important;
@@ -189,10 +179,8 @@
   }
   .btn-agregar:hover { background: var(--brand-orange-h) !important; }
 
-  /* Número pedido en tabla */
   .pedido-num { font-weight: 700; color: var(--brand-orange); }
 
-  /* MODAL */
   #modalPedido {
     display: none;
     position: fixed;
@@ -275,7 +263,6 @@
   }
   .btn-save:hover { background: var(--brand-orange-h); }
 
-  /* RESPONSIVE */
   @media (max-width: 720px) {
     .main-content { margin-left: 0; padding: 16px; padding-top: 60px; }
     .reporte-header { flex-direction: column; }
@@ -293,13 +280,12 @@
 </head>
 <body>
 
-<!-- ── HAMBURGER (móvil) ── -->
 <button class="hamburger" id="hamburger" aria-label="Menú">
   <span></span><span></span><span></span>
 </button>
 <div class="overlay" id="overlay"></div>
 
-<!-- ── SIDEBAR ── -->
+<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
     <div>
@@ -315,8 +301,8 @@
     <a class="nav-item" href="/clientes">
       <span class="nav-icon">◎</span> Clientes
     </a>
-    <a class="nav-item active" href="/paginas/oportunidades.html">
-      <span class="nav-icon">◈</span> Oportunidades
+    <a class="nav-item active" href="/reporte">
+      <span class="nav-icon">◈</span> Reporte Comercial
     </a>
     <div class="nav-label">Reportes</div>
     <a class="nav-item" href="#">
@@ -334,7 +320,6 @@
     </a>
   </nav>
 
-  <!-- PERFIL DINÁMICO DEL SIDEBAR -->
   <div class="sidebar-user">
     <div class="user-avatar" id="avatarIniciales">👤</div>
     <div class="user-info">
@@ -350,10 +335,9 @@
   </div>
 </aside>
 
-<!-- ── MAIN CONTENT ── -->
+<!-- MAIN CONTENT -->
 <div class="main-content">
 
-  <!-- HEADER -->
   <div class="reporte-header">
     <div>
       <h2 id="tituloReporte">📊 Reporte Comercial Mensual</h2>
@@ -362,12 +346,10 @@
     <div id="contenedorFiltroVendedor" style="display:none;">
       <label>Ver Asesor:</label>
       <select id="filtroVendedor" onchange="cambioVendedorAdmin()">
-        <!-- Se inyecta dinámicamente con JS -->
       </select>
     </div>
   </div>
 
-  <!-- CONTROL BAR -->
   <div class="control-bar">
     <div>
       <label>Mes:</label>
@@ -396,7 +378,6 @@
     <button class="btn-action btn-agregar" onclick="abrirModalPedido()">＋ Agregar Pedido</button>
   </div>
 
-  <!-- KPIs -->
   <div class="kpi-container">
     <div class="kpi-card">
       <h3>Total Ventas</h3>
@@ -412,7 +393,6 @@
     </div>
   </div>
 
-  <!-- TABLA PEDIDOS -->
   <div class="panel-tabla">
     <table>
       <thead>
@@ -429,7 +409,7 @@
     </table>
   </div>
 
-</div><!-- /main-content -->
+</div>
 
 <!-- MODAL NUEVO PEDIDO -->
 <div id="modalPedido">
@@ -472,62 +452,60 @@
   </div>
 </div>
 
-<!-- ════════════════════════════
-       SCRIPT CONTROLADO LOGIC
-════════════════════════════ -->
 <script>
-// ✅ REEMPLAZAR con esto:
-const API_URL = "https://crm-servirodillos.onrender.com";
+  const API_URL = "https://crm-servirodillos.onrender.com";
 
-// 🔒 Validar sesión igual que en los otros archivos
-const usuarioSesion = JSON.parse(localStorage.getItem('usuarioCRM'));
-if (!usuarioSesion) window.location.href = "/login";
+  // ✅ FIX 1: Leer sesión desde el objeto completo 'usuarioCRM' (igual que index.html y clientes.html)
+  const usuarioSesion = JSON.parse(localStorage.getItem('usuarioCRM'));
 
-const ROL_USUARIO    = usuarioSesion.rol;
-const ID_USUARIO     = usuarioSesion.id;
-const NOMBRE_USUARIO = usuarioSesion.nombre;
+  // 🔒 FIX 2: Validar sesión — redirigir si no existe
+  if (!usuarioSesion) window.location.href = "/login";
 
-let vendedorSeleccionado = ID_USUARIO;
+  const ROL_USUARIO    = usuarioSesion.rol;     // ← era localStorage.getItem('rol'), ahora lee del objeto
+  const ID_USUARIO     = usuarioSesion.id;      // ← era localStorage.getItem('vendedorId') || 2 (hardcodeado!)
+  const NOMBRE_USUARIO = usuarioSesion.nombre;
+
+  let vendedorSeleccionado = ID_USUARIO;
+
   const formatoMoneda = new Intl.NumberFormat('es-CO', {
     style: 'currency', currency: 'COP', minimumFractionDigits: 0
   });
 
-  // 🔄 CARGAR REPORTES Y FILTRAR POR ASESOR SELECCIONADO
   async function cargarReporteMensual() {
     const mes  = document.getElementById('filtroMes').value;
     const anio = document.getElementById('filtroAnio').value;
     let url    = `${API_URL}/api/pedidos?mes=${mes}&anio=${anio}`;
-    
+
     if (vendedorSeleccionado !== 'todos') {
       url += `&vendedorId=${vendedorSeleccionado}`;
     }
-    
+
     try {
       const res  = await fetch(url);
       const data = await res.json();
-      
+
       document.getElementById('kpiTotal').innerText = formatoMoneda.format(data.kpis.totalVenta);
       document.getElementById('kpiMeta').innerText  = formatoMoneda.format(data.kpis.meta);
-      
+
       const restEl = document.getElementById('kpiRestante');
       restEl.innerText   = formatoMoneda.format(data.kpis.restante);
       restEl.style.color = data.kpis.restante <= 0 ? 'var(--brand-green-d)' : '#C0392B';
-      
+
       const tbody = document.getElementById('tablaPedidos');
       tbody.innerHTML = '';
-      
+
       if (!data.pedidos.length) {
         tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:36px;color:var(--ink-3);font-style:italic;">No hay pedidos registrados en este mes.</td></tr>`;
         return;
       }
-      
+
       data.pedidos.forEach(p => {
         const claseFila   = p.estado === 'Pendiente' ? 'row-pendiente' : 'row-entregado';
         const claseBadge  = p.estado === 'Pendiente' ? 'badge-pendiente' : 'badge-entregado';
         const nuevoEstado = p.estado === 'Pendiente' ? 'Entregado' : 'Pendiente';
         const textoBoton  = p.estado === 'Pendiente' ? '✔ Entregar' : '↩ Revertir';
         const fecha       = new Date(p.fecha).toLocaleDateString('es-CO', { timeZone: 'UTC' });
-        
+
         tbody.innerHTML += `
           <tr class="${claseFila}">
             <td style="font-size:12px;color:var(--ink-3)">${fecha}</td>
@@ -538,8 +516,8 @@ let vendedorSeleccionado = ID_USUARIO;
             <td><button class="btn-action" onclick="cambiarEstadoPedido(${p.id}, '${nuevoEstado}')">${textoBoton}</button></td>
           </tr>`;
       });
-    } catch (e) { 
-      console.error("❌ Error cargando el reporte:", e); 
+    } catch (e) {
+      console.error("❌ Error cargando el reporte:", e);
     }
   }
 
@@ -551,65 +529,59 @@ let vendedorSeleccionado = ID_USUARIO;
         body: JSON.stringify({ estado: nuevoEstado })
       });
       if (res.ok) cargarReporteMensual();
-    } catch (e) { 
-      console.error("Error al actualizar:", e); 
+    } catch (e) {
+      console.error("Error al actualizar:", e);
     }
   }
 
-  // 🚀 INICIALIZACIÓN DE LA INTERFAZ Y RECONOCIMIENTO DE PERFIL
   document.addEventListener("DOMContentLoaded", async () => {
     const mesActual = new Date().getMonth() + 1;
     document.getElementById('filtroMes').value = mesActual;
 
-    // Recuperación de variables reales del LocalStorage
-const nombreUsuario = NOMBRE_USUARIO;
+    // ✅ FIX 3: El nombre viene de NOMBRE_USUARIO (del objeto de sesión), no de claves sueltas
+    const nombreUsuario = NOMBRE_USUARIO;
 
-    // 👤 Sincronización del Perfil Dinámico en el Sidebar
+    // Pintar sidebar
     if (document.getElementById('lblNombreUsuario'))
       document.getElementById('lblNombreUsuario').textContent = nombreUsuario;
     if (document.getElementById('lblRolUsuario'))
       document.getElementById('lblRolUsuario').textContent = ROL_USUARIO === 'admin' ? 'Administrador' : 'Asesor Comercial';
-    if (document.getElementById('avatarIniciales')) {
-      document.getElementById('avatarIniciales').textContent = ROL_USUARIO === 'admin' ? '💼' : nombreUsuario.slice(0,2).toUpperCase();
-    }
+    if (document.getElementById('avatarIniciales'))
+      document.getElementById('avatarIniciales').textContent = nombreUsuario.slice(0, 2).toUpperCase();
 
-    // Comportamiento según el rol
-    vendedorSeleccionado = ID_USUARIO; // El Admin inicia viendo sus propios pedidos para evitar pantalla vacía
+    vendedorSeleccionado = ID_USUARIO;
 
     if (ROL_USUARIO === 'admin') {
       document.getElementById('tituloReporte').innerText    = "💼 Panel de Control Comercial";
       document.getElementById('subtituloUsuario').innerText = `Administrador: ${nombreUsuario}`;
       document.getElementById('contenedorFiltroVendedor').style.display = 'flex';
-      
-      // Inyectar el select cruzado
       await cargarVendedoresParaAdmin(nombreUsuario);
     } else {
       document.getElementById('tituloReporte').innerText    = "📊 Reporte Comercial Mensual";
       document.getElementById('subtituloUsuario').innerText = `Asesor: ${nombreUsuario}`;
     }
-    
+
     cargarReporteMensual();
   });
 
-  // 👥 INYECTOR DEL SELECT DE ADMINISTRACIÓN
   async function cargarVendedoresParaAdmin(nombreAdmin) {
     try {
       const res        = await fetch(`${API_URL}/api/vendedores`);
       const vendedores = await res.json();
       const sel        = document.getElementById('filtroVendedor');
-      
+
       sel.innerHTML = `
         <option value="${ID_USUARIO}">⭐ Mis Pedidos (${nombreAdmin})</option>
         <option value="todos">🌍 Todos los Vendedores</option>
       `;
-      
+
       vendedores.forEach(v => {
         if (String(v.id) !== String(ID_USUARIO)) {
           sel.innerHTML += `<option value="${v.id}">👤 ${v.nombre}</option>`;
         }
       });
-    } catch (e) { 
-      console.error("❌ Error cargando vendedores:", e); 
+    } catch (e) {
+      console.error("❌ Error cargando vendedores:", e);
     }
   }
 
@@ -618,13 +590,12 @@ const nombreUsuario = NOMBRE_USUARIO;
     cargarReporteMensual();
   }
 
-  // 🚪 CONTROLES DEL FORMULARIO MODAL
   function abrirModalPedido() {
     document.getElementById('modalPedido').style.display = 'flex';
     document.getElementById('pedFecha').value = new Date().toISOString().split('T')[0];
     cargarClientesEnModal();
   }
-  
+
   function cerrarModalPedido() {
     document.getElementById('modalPedido').style.display = 'none';
     document.getElementById('formNuevoPedido').reset();
@@ -638,17 +609,17 @@ const nombreUsuario = NOMBRE_USUARIO;
       const response = await fetch(urlFinal);
       const clientes = await response.json();
       const sel      = document.getElementById('pedCliente');
-      
+
       if (!sel) return;
-      if (!clientes.length) { 
-        sel.innerHTML = '<option value="">No tienes clientes asignados</option>'; 
-        return; 
+      if (!clientes.length) {
+        sel.innerHTML = '<option value="">No tienes clientes asignados</option>';
+        return;
       }
-      
+
       sel.innerHTML = '<option value="">-- Seleccione un cliente --</option>' +
         clientes.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
-    } catch (e) { 
-      console.error("❌ Error cargando clientes:", e); 
+    } catch (e) {
+      console.error("❌ Error cargando clientes:", e);
     }
   }
 
@@ -660,7 +631,7 @@ const nombreUsuario = NOMBRE_USUARIO;
       cliente_nombre: document.getElementById('pedCliente').value,
       valor:          document.getElementById('pedValor').value,
       estado:         document.getElementById('pedEstado').value,
-      vendedor_id:    ID_USUARIO
+      vendedor_id:    ID_USUARIO   // ← siempre usa el ID real de sesión
     };
     try {
       const response = await fetch(`${API_URL}/api/pedidos`, {
@@ -668,28 +639,28 @@ const nombreUsuario = NOMBRE_USUARIO;
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(nuevoPedido)
       });
-      if (response.ok) { 
-        cerrarModalPedido(); 
-        cargarReporteMensual(); 
-      } else { 
-        const err = await response.json(); 
-        alert("Error al guardar: " + err.error); 
+      if (response.ok) {
+        cerrarModalPedido();
+        cargarReporteMensual();
+      } else {
+        const err = await response.json();
+        alert("Error al guardar: " + err.error);
       }
-    } catch (e) { 
-      console.error("❌ Error guardando pedido:", e); 
+    } catch (e) {
+      console.error("❌ Error guardando pedido:", e);
     }
   }
 
   function cerrarSesion() {
-    localStorage.clear(); // Limpieza completa para prevenir persistencia de perfiles cruzados
+    localStorage.removeItem('usuarioCRM');
     window.location.href = "/login";
   }
 
-  // 📱 ANIMACIÓN HAMBURGER MÓVIL
+  // Hamburger móvil
   const sidebar   = document.getElementById('sidebar');
   const hamburger = document.getElementById('hamburger');
   const overlay   = document.getElementById('overlay');
-  
+
   hamburger.addEventListener('click', () => {
     sidebar.classList.toggle('open');
     overlay.classList.toggle('show');
