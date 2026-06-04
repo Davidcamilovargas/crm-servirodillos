@@ -411,6 +411,7 @@ td[colspan] {
 }
 </style>
 </head>
+
 <body>
 
 <!-- Hamburger (móvil) -->
@@ -454,8 +455,7 @@ td[colspan] {
     </a>
   </nav>
 
-  <div class="sidebar-user">
-    <div class="user-avatar" id="avatarIniciales">👤</div>
+  <div class="sidebar-user">    <div class="user-avatar" id="avatarIniciales">👤</div>
     <div class="user-info">
       <div class="user-name" id="lblNombreUsuario">Cargando...</div>
       <div class="user-role" id="lblRolUsuario" style="text-transform: capitalize;">...</div>
@@ -468,7 +468,7 @@ td[colspan] {
       <span>Cerrar Sesión</span>
     </button>
   </div>
-</aside>
+    </aside>
 
 <!-- MAIN -->
 <main class="main-content">
@@ -483,6 +483,31 @@ td[colspan] {
           <option value="2">David Vargas</option>
           <option value="1">Ismael</option>
         </select>
+        <div class="filter-box" style="display: flex; gap: 15px; align-items: center;">
+    
+    <div id="filtroCiudad">
+        <label style="color: #a0aec0; margin-right: 10px; font-size: 0.9rem;">Ciudad:</label>
+        <select id="selectCiudad" onchange="filtrarClientesPorCiudad()">
+            <option value="">Todas las ciudades</option>
+            <option value="ARMENIA">Armenia</option>
+            <option value="DOS QUEBRADAS">Dos Quebradas</option>
+            <option value="GIRARDOTA">Girardota</option>
+            <option value="GUARNE">Guarne</option>
+            <option value="ITAGÜÍ">Itagüí</option>
+            <option value="MEDELLIN">Medellín</option>
+            <option value="SABANETA">Sabaneta</option>
+        </select>
+    </div>
+
+    <div id="filtroAdmin" style="display: none;">
+        <label style="color: #a0aec0; margin-right: 10px; font-size: 0.9rem;">Vendedor:</label>
+        <select id="selectVendedor" onchange="filtrarClientes()">
+            <option value="">Todos los clientes</option>
+            <option value="2">David Vargas</option>
+            <option value="1">Ismael</option>
+        </select>
+    </div>
+</div>  
       </div>
     </div>
 
@@ -516,6 +541,9 @@ td[colspan] {
 
   const API_URL = "https://crm-servirodillos.onrender.com";
 
+  // 🌟 VARIABLE GLOBAL: Guarda los clientes descargados para poder filtrarlos localmente por ciudad
+  let listaClientesGlobal = [];
+
   document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('lblNombreUsuario').textContent = NOMBRE_USUARIO;
 
@@ -540,30 +568,68 @@ td[colspan] {
       const urlFinal = idFiltro ? `${urlBase}?vendedorId=${idFiltro}` : urlBase;
 
       const response = await fetch(urlFinal);
-      const clientes = await response.json();
-      const tbody    = document.getElementById('tablaClientes');
+      
+      // 🌟 CAMBIO: Almacenamos la respuesta en la lista global en vez de mapearla directo
+      listaClientesGlobal = await response.json();
 
-      if (!clientes.length) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--ink-3); padding:36px; font-style:italic;">No hay clientes registrados.</td></tr>';
-        return;
-      }
+      // 🌟 Limpiamos el filtro de ciudad cada vez que se descarguen datos nuevos de la API
+      const selectCiudad = document.getElementById('selectCiudad');
+      if (selectCiudad) selectCiudad.value = "";
 
-      tbody.innerHTML = clientes.map(c => `
-        <tr>
-          <td style="font-weight:600;">${c.nombre}</td>
-          <td style="color:var(--ink-3);">${c.ciudad || '—'}</td>
-          <td style="color:var(--ink-3);">${c.telefono_encargado || '—'}</td>
-          <td>
-            <span class="badge ${c.importancia ? c.importancia.toLowerCase() : 'baja'}">
-              ${c.importancia || 'MEDIA'}
-            </span>
-          </td>
-        </tr>
-      `).join('');
+      // Dibujamos la tabla con todos los clientes cargados
+      dibujarTabla(listaClientesGlobal);
 
     } catch (error) {
       console.error("Error al cargar clientes:", error);
     }
+  }
+
+  // 🌟 NUEVA FUNCIÓN: Se encarga exclusivamente de pintar el HTML en el tbody
+  function dibujarTabla(clientes) {
+    const tbody = document.getElementById('tablaClientes');
+    if (!tbody) return;
+
+    if (!clientes.length) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--ink-3); padding:36px; font-style:italic;">No se encontraron clientes.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = clientes.map(c => `
+      <tr>
+        <td style="font-weight:600;">${c.nombre}</td>
+        <td style="color:var(--ink-3);">${c.ciudad || '—'}</td>
+        <td style="color:var(--ink-3);">${c.telefono_encargado || '—'}</td>
+        <td>
+          <span class="badge ${c.importancia ? c.importancia.toLowerCase() : 'baja'}">
+            ${c.importancia || 'MEDIA'}
+          </span>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // 🌟 NUEVA FUNCIÓN: Filtra en tiempo real los datos cargados usando el select de ciudad
+  function filtrarClientesPorCiudad() {
+    const ciudadSeleccionada = document.getElementById('selectCiudad').value;
+    
+    // Si no hay ciudad seleccionada, pintamos toda la lista global otra vez
+    if (!ciudadSeleccionada) {
+      dibujarTabla(listaClientesGlobal);
+      return;
+    }
+
+    // Filtramos localmente comparando strings de forma limpia
+    const clientesFiltrados = listaClientesGlobal.filter(c => {
+      if (!c.ciudad) return false;
+      
+      // Normalizamos ambos textos (Pasar a MAYÚSCULAS y remover tildes/espacios raros)
+      const ciudadCliente = c.ciudad.toUpperCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const ciudadFiltro = ciudadSeleccionada.toUpperCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      
+      return ciudadCliente === ciudadFiltro;
+    });
+
+    dibujarTabla(clientesFiltrados);
   }
 
   function filtrarPorVendedor() {
