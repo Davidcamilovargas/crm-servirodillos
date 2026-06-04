@@ -476,18 +476,11 @@ td[colspan] {
     <div class="header-seccion">
       <h2>👥 Base de Datos de Clientes</h2>
 
-      <div class="filter-box" id="filtroAdmin" style="display: none;">
-        <label>Vendedor:</label>
-        <select id="selectVendedor" onchange="filtrarPorVendedor()">
-          <option value="">Todos los clientes</option>
-          <option value="2">David Vargas</option>
-          <option value="1">Ismael Vargas</option>
-        </select>
-        <div class="filter-box" style="display: flex; gap: 15px; align-items: center;">
+<div class="filter-box" style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
     
-    <div id="filtroCiudad">
+    <div id="filtroCiudad" style="display: flex; align-items: center;">
         <label style="color: #a0aec0; margin-right: 10px; font-size: 0.9rem;">Ciudad:</label>
-        <select id="selectCiudad" onchange="filtrarClientesPorCiudad()">
+        <select id="selectCiudad" onchange="filtrarClientesPorCiudad()" style="background: #1a1c24; color: #fff; padding: 10px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); outline: none; cursor: pointer;">
             <option value="">Todas las ciudades</option>
             <option value="ARMENIA">Armenia</option>
             <option value="DOS QUEBRADAS">Dos Quebradas</option>
@@ -499,16 +492,16 @@ td[colspan] {
         </select>
     </div>
 
-    <div id="filtroAdmin" style="display: none;">
+    <div id="filtroAdmin" style="display: none; align-items: center;">
         <label style="color: #a0aec0; margin-right: 10px; font-size: 0.9rem;">Vendedor:</label>
-        <select id="selectVendedor" onchange="filtrarClientes()">
+        <select id="selectVendedor" onchange="filtrarPorVendedor()" style="background: #1a1c24; color: #fff; padding: 10px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); outline: none; cursor: pointer;">
             <option value="">Todos los clientes</option>
             <option value="2">David Vargas</option>
             <option value="1">Ismael Vargas</option>
         </select>
     </div>
-</div>  
-      </div>
+
+</div>
     </div>
 
     <div class="table-wrap">
