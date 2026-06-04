@@ -333,13 +333,16 @@
       <span class="nav-icon">⊙</span> Configuración
     </a>
   </nav>
+
+  <!-- PERFIL DINÁMICO DEL SIDEBAR -->
   <div class="sidebar-user">
     <div class="user-avatar" id="avatarIniciales">👤</div>
     <div class="user-info">
       <div class="user-name" id="lblNombreUsuario">Cargando...</div>
-      <div class="user-role" id="lblRolUsuario">...</div>
+      <div class="user-role" id="lblRolUsuario" style="text-transform: capitalize;">...</div>
     </div>
   </div>
+
   <div class="sidebar-footer">
     <button onclick="cerrarSesion()" class="btn-logout">
       ↪ <span>Cerrar Sesión</span>
@@ -359,7 +362,7 @@
     <div id="contenedorFiltroVendedor" style="display:none;">
       <label>Ver Asesor:</label>
       <select id="filtroVendedor" onchange="cambioVendedorAdmin()">
-        <option value="todos">🌍 Todos los Vendedores</option>
+        <!-- Se inyecta dinámicamente con JS -->
       </select>
     </div>
   </div>
@@ -470,43 +473,61 @@
 </div>
 
 <!-- ════════════════════════════
-     SCRIPT — LÓGICA SIN CAMBIOS
+       SCRIPT CONTROLADO LOGIC
 ════════════════════════════ -->
 <script>
-  const API_URL     = "https://crm-servirodillos.onrender.com";
-  const ROL_USUARIO = localStorage.getItem('rol') || 'vendedor';
-  const ID_USUARIO  = localStorage.getItem('vendedorId') || 2;
-  let vendedorSeleccionado = ID_USUARIO;
+// ✅ REEMPLAZAR con esto:
+const API_URL = "https://crm-servirodillos.onrender.com";
 
+// 🔒 Validar sesión igual que en los otros archivos
+const usuarioSesion = JSON.parse(localStorage.getItem('usuarioCRM'));
+if (!usuarioSesion) window.location.href = "/login";
+
+const ROL_USUARIO    = usuarioSesion.rol;
+const ID_USUARIO     = usuarioSesion.id;
+const NOMBRE_USUARIO = usuarioSesion.nombre;
+
+let vendedorSeleccionado = ID_USUARIO;
   const formatoMoneda = new Intl.NumberFormat('es-CO', {
     style: 'currency', currency: 'COP', minimumFractionDigits: 0
   });
 
+  // 🔄 CARGAR REPORTES Y FILTRAR POR ASESOR SELECCIONADO
   async function cargarReporteMensual() {
     const mes  = document.getElementById('filtroMes').value;
     const anio = document.getElementById('filtroAnio').value;
     let url    = `${API_URL}/api/pedidos?mes=${mes}&anio=${anio}`;
-    if (vendedorSeleccionado !== 'todos') url += `&vendedorId=${vendedorSeleccionado}`;
+    
+    if (vendedorSeleccionado !== 'todos') {
+      url += `&vendedorId=${vendedorSeleccionado}`;
+    }
+    
     try {
       const res  = await fetch(url);
       const data = await res.json();
+      
       document.getElementById('kpiTotal').innerText = formatoMoneda.format(data.kpis.totalVenta);
       document.getElementById('kpiMeta').innerText  = formatoMoneda.format(data.kpis.meta);
+      
       const restEl = document.getElementById('kpiRestante');
       restEl.innerText   = formatoMoneda.format(data.kpis.restante);
       restEl.style.color = data.kpis.restante <= 0 ? 'var(--brand-green-d)' : '#C0392B';
+      
       const tbody = document.getElementById('tablaPedidos');
       tbody.innerHTML = '';
+      
       if (!data.pedidos.length) {
         tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:36px;color:var(--ink-3);font-style:italic;">No hay pedidos registrados en este mes.</td></tr>`;
         return;
       }
+      
       data.pedidos.forEach(p => {
         const claseFila   = p.estado === 'Pendiente' ? 'row-pendiente' : 'row-entregado';
         const claseBadge  = p.estado === 'Pendiente' ? 'badge-pendiente' : 'badge-entregado';
         const nuevoEstado = p.estado === 'Pendiente' ? 'Entregado' : 'Pendiente';
         const textoBoton  = p.estado === 'Pendiente' ? '✔ Entregar' : '↩ Revertir';
         const fecha       = new Date(p.fecha).toLocaleDateString('es-CO', { timeZone: 'UTC' });
+        
         tbody.innerHTML += `
           <tr class="${claseFila}">
             <td style="font-size:12px;color:var(--ink-3)">${fecha}</td>
@@ -517,7 +538,9 @@
             <td><button class="btn-action" onclick="cambiarEstadoPedido(${p.id}, '${nuevoEstado}')">${textoBoton}</button></td>
           </tr>`;
       });
-    } catch (e) { console.error("❌ Error cargando el reporte:", e); }
+    } catch (e) { 
+      console.error("❌ Error cargando el reporte:", e); 
+    }
   }
 
   async function cambiarEstadoPedido(id, nuevoEstado) {
@@ -528,47 +551,66 @@
         body: JSON.stringify({ estado: nuevoEstado })
       });
       if (res.ok) cargarReporteMensual();
-    } catch (e) { console.error("Error al actualizar:", e); }
+    } catch (e) { 
+      console.error("Error al actualizar:", e); 
+    }
   }
 
+  // 🚀 INICIALIZACIÓN DE LA INTERFAZ Y RECONOCIMIENTO DE PERFIL
   document.addEventListener("DOMContentLoaded", async () => {
     const mesActual = new Date().getMonth() + 1;
     document.getElementById('filtroMes').value = mesActual;
 
-    const nombreUsuario = localStorage.getItem('nombre') ||
-                          localStorage.getItem('nombreUsuario') || 'David Vargas';
+    // Recuperación de variables reales del LocalStorage
+const nombreUsuario = NOMBRE_USUARIO;
 
-    // Pintar sidebar
+    // 👤 Sincronización del Perfil Dinámico en el Sidebar
     if (document.getElementById('lblNombreUsuario'))
       document.getElementById('lblNombreUsuario').textContent = nombreUsuario;
     if (document.getElementById('lblRolUsuario'))
-      document.getElementById('lblRolUsuario').textContent = ROL_USUARIO;
-    if (document.getElementById('avatarIniciales'))
-      document.getElementById('avatarIniciales').textContent = nombreUsuario.slice(0,2).toUpperCase();
+      document.getElementById('lblRolUsuario').textContent = ROL_USUARIO === 'admin' ? 'Administrador' : 'Asesor Comercial';
+    if (document.getElementById('avatarIniciales')) {
+      document.getElementById('avatarIniciales').textContent = ROL_USUARIO === 'admin' ? '💼' : nombreUsuario.slice(0,2).toUpperCase();
+    }
+
+    // Comportamiento según el rol
+    vendedorSeleccionado = ID_USUARIO; // El Admin inicia viendo sus propios pedidos para evitar pantalla vacía
 
     if (ROL_USUARIO === 'admin') {
       document.getElementById('tituloReporte').innerText    = "💼 Panel de Control Comercial";
       document.getElementById('subtituloUsuario').innerText = `Administrador: ${nombreUsuario}`;
       document.getElementById('contenedorFiltroVendedor').style.display = 'flex';
-      await cargarVendedoresParaAdmin();
-      vendedorSeleccionado = 'todos';
+      
+      // Inyectar el select cruzado
+      await cargarVendedoresParaAdmin(nombreUsuario);
     } else {
       document.getElementById('tituloReporte').innerText    = "📊 Reporte Comercial Mensual";
       document.getElementById('subtituloUsuario').innerText = `Asesor: ${nombreUsuario}`;
-      vendedorSeleccionado = ID_USUARIO;
     }
+    
     cargarReporteMensual();
   });
 
-  async function cargarVendedoresParaAdmin() {
+  // 👥 INYECTOR DEL SELECT DE ADMINISTRACIÓN
+  async function cargarVendedoresParaAdmin(nombreAdmin) {
     try {
       const res        = await fetch(`${API_URL}/api/vendedores`);
       const vendedores = await res.json();
       const sel        = document.getElementById('filtroVendedor');
+      
+      sel.innerHTML = `
+        <option value="${ID_USUARIO}">⭐ Mis Pedidos (${nombreAdmin})</option>
+        <option value="todos">🌍 Todos los Vendedores</option>
+      `;
+      
       vendedores.forEach(v => {
-        sel.innerHTML += `<option value="${v.id}">👤 ${v.nombre}</option>`;
+        if (String(v.id) !== String(ID_USUARIO)) {
+          sel.innerHTML += `<option value="${v.id}">👤 ${v.nombre}</option>`;
+        }
       });
-    } catch (e) { console.error("❌ Error cargando vendedores:", e); }
+    } catch (e) { 
+      console.error("❌ Error cargando vendedores:", e); 
+    }
   }
 
   function cambioVendedorAdmin() {
@@ -576,11 +618,13 @@
     cargarReporteMensual();
   }
 
+  // 🚪 CONTROLES DEL FORMULARIO MODAL
   function abrirModalPedido() {
     document.getElementById('modalPedido').style.display = 'flex';
     document.getElementById('pedFecha').value = new Date().toISOString().split('T')[0];
     cargarClientesEnModal();
   }
+  
   function cerrarModalPedido() {
     document.getElementById('modalPedido').style.display = 'none';
     document.getElementById('formNuevoPedido').reset();
@@ -594,11 +638,18 @@
       const response = await fetch(urlFinal);
       const clientes = await response.json();
       const sel      = document.getElementById('pedCliente');
+      
       if (!sel) return;
-      if (!clientes.length) { sel.innerHTML = '<option value="">No tienes clientes asignados</option>'; return; }
+      if (!clientes.length) { 
+        sel.innerHTML = '<option value="">No tienes clientes asignados</option>'; 
+        return; 
+      }
+      
       sel.innerHTML = '<option value="">-- Seleccione un cliente --</option>' +
         clientes.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
-    } catch (e) { console.error("❌ Error cargando clientes:", e); }
+    } catch (e) { 
+      console.error("❌ Error cargando clientes:", e); 
+    }
   }
 
   async function guardarPedido(event) {
@@ -617,20 +668,28 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(nuevoPedido)
       });
-      if (response.ok) { cerrarModalPedido(); cargarReporteMensual(); }
-      else { const err = await response.json(); alert("Error al guardar: " + err.error); }
-    } catch (e) { console.error("❌ Error guardando pedido:", e); }
+      if (response.ok) { 
+        cerrarModalPedido(); 
+        cargarReporteMensual(); 
+      } else { 
+        const err = await response.json(); 
+        alert("Error al guardar: " + err.error); 
+      }
+    } catch (e) { 
+      console.error("❌ Error guardando pedido:", e); 
+    }
   }
 
   function cerrarSesion() {
-    localStorage.removeItem('usuarioCRM');
+    localStorage.clear(); // Limpieza completa para prevenir persistencia de perfiles cruzados
     window.location.href = "/login";
   }
 
-  // Hamburger móvil
+  // 📱 ANIMACIÓN HAMBURGER MÓVIL
   const sidebar   = document.getElementById('sidebar');
   const hamburger = document.getElementById('hamburger');
   const overlay   = document.getElementById('overlay');
+  
   hamburger.addEventListener('click', () => {
     sidebar.classList.toggle('open');
     overlay.classList.toggle('show');

@@ -81,7 +81,7 @@ app.post('/api/login', (req, res) => {
                 id: usuario.id,
                 nombre: usuario.nombre,
                 email: usuario.email,
-                role: usuario.rol
+                rol: usuario.rol  
             }
         });
     });
