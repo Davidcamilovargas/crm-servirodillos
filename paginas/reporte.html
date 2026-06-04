@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CRM Servirodillos - Reporte Comercial</title>
-  <link rel="stylesheet" href="/css/styles.css"> <style>
+
+  <style>
     /* Estilos base con la estética del proyecto */
     :root {
       --bg-principal: #0f111a;
@@ -320,28 +321,28 @@
     }
 
     // 🚀 CONTROL ROLES: INICIALIZACIÓN DE LA VISTA
-    document.addEventListener("DOMContentLoaded", async () => {
-      const mesActual = new Date().getMonth() + 1;
-      document.getElementById('filtroMes').value = mesActual;
+document.addEventListener("DOMContentLoaded", async () => {
+  const mesActual = new Date().getMonth() + 1;
+  document.getElementById('filtroMes').value = mesActual;
 
-      const nombreUsuario = localStorage.getItem('nombre') || 'Usuario';
-      
-      if (ROL_USUARIO === 'admin') {
-        document.getElementById('tituloReporte').innerText = "💼 Panel de Control Comercial";
-        document.getElementById('subtituloUsuario').innerText = `Administrador: ${nombreUsuario}`;
-        document.getElementById('contenedorFiltroVendedor').style.display = 'block';
-        
-        await cargarVendedoresParaAdmin();
-        vendedorSeleccionado = 'todos'; 
-      } else {
-        document.getElementById('tituloReporte').innerText = "📊 Reporte Comercial Mensual";
-        document.getElementById('subtituloUsuario').innerText = `Asesor: ${nombreUsuario}`;
-        vendedorSeleccionado = ID_USUARIO;
-      }
-      
-      cargarReporteMensual();
-    });
-
+  // Intentamos leer 'nombre', si no 'nombreUsuario', o si no que use tu nombre por defecto
+  const nombreUsuario = localStorage.getItem('nombre') || localStorage.getItem('nombreUsuario') || 'David Vargas';
+  
+  if (ROL_USUARIO === 'admin') {
+    document.getElementById('tituloReporte').innerText = "💼 Panel de Control Comercial";
+    document.getElementById('subtituloUsuario').innerText = `Administrador: ${nombreUsuario}`;
+    document.getElementById('contenedorFiltroVendedor').style.display = 'block';
+    
+    await cargarVendedoresParaAdmin();
+    vendedorSeleccionado = 'todos'; 
+  } else {
+    document.getElementById('tituloReporte').innerText = "📊 Reporte Comercial Mensual";
+    document.getElementById('subtituloUsuario').innerText = `Asesor: ${nombreUsuario}`;
+    vendedorSeleccionado = ID_USUARIO;
+  }
+  
+  cargarReporteMensual();
+});
     async function cargarVendedoresParaAdmin() {
       try {
         const res = await fetch(`${API_URL}/api/vendedores`); 
@@ -364,8 +365,8 @@
     // 🚪 CONTROL DEL MODAL
     function abrirModalPedido() {
       document.getElementById('modalPedido').style.display = 'flex';
-      document.getElementById('pedFecha').value = new Date().toISOString().split('T')[0];
-      cargarClientesEnModal();
+  document.getElementById('pedFecha').value = new Date().toISOString().split('T')[0];
+  cargarClientesEnModal();
     }
 
     function cerrarModalPedido() {
