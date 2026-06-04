@@ -218,17 +218,20 @@ app.post('/api/pedidos', async (req, res) => {
 // 2. OBTENER PEDIDOS FILTRADOS POR MES, AÑO Y VENDEDOR + KPIs
 app.get('/api/pedidos', async (req, res) => {
     const { vendedorId, mes, anio } = req.query; 
-    // Si el frontend no manda mes o año, tomamos el mes actual por defecto (Junio 2026)
+    
     const fechaActual = new Date();
     const filtroMes = mes ? parseInt(mes) : (fechaActual.getMonth() + 1);
     const filtroAnio = anio ? parseInt(anio) : fechaActual.getFullYear();
 
     try {
-        // Filtramos usando MONTH(fecha) y YEAR(fecha) de MySQL
-        let query = `SELECT * FROM pedidos WHERE MONTH(fecha) = ? AND YEAR(fecha) = ?`;
-        let params = [filtroMes, filtroAnio];
+        // Formateamos el inicio y fin del mes en formato 'YYYY-MM-DD' para que MySQL no falle nunca
+        const fechaInicio = `${filtroAnio}-${String(filtroMes).padStart(2, '0')}-01`;
+        const fechaFin = `${filtroAnio}-${String(filtroMes).padStart(2, '0')}-31`; // MySQL entiende el rango
 
-        if (vendedorId) {
+        let query = `SELECT * FROM pedidos WHERE fecha BETWEEN ? AND ?`;
+        let params = [fechaInicio, fechaFin];
+
+        if (vendedorId && vendedorId !== 'null' && vendedorId !== 'undefined') {
             query += ` AND vendedor_id = ?`;
             params.push(vendedorId);
         }
@@ -236,21 +239,20 @@ app.get('/api/pedidos', async (req, res) => {
         query += ` ORDER BY fecha DESC`;
         const [pedidos] = await db.query(query, params);
 
-        // 🧮 Cálculos dinámicos del mes seleccionado
-        const totalVenta = pedidos.reduce((sum, p) => sum + parseFloat(p.valor), 0);
-        const META_MES = 15000000; // Meta de 15 millones (la puedes cambiar o hacer dinámica)
+        // Calculamos los totales con seguridad
+        const totalVenta = pedidos.reduce((sum, p) => sum + parseFloat(p.valor || 0), 0);
+        const META_MES = 15000000; 
         const restante = META_MES - totalVenta;
 
         res.json({
             pedidos,
-            kpis: { totalVenta, meta: META_MES, restante, mesFiltrado: filtroMes, anioFiltrado: filtroAnio }
+            kpis: { totalVenta, meta: META_MES, restante }
         });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error al cargar reporte mensual' });
+        console.error('❌ Error real en el servidor:', error);
+        res.status(500).json({ error: 'Error interno al cargar el reporte comercial', detalle: error.message });
     }
 });
-
 // 3. EDITAR ESTADO DE UN PEDIDO (Pendiente <-> Entregado)
 app.put('/api/pedidos/:id', async (req, res) => {
     const { id } = req.params;
