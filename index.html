@@ -53,11 +53,11 @@
       <span class="nav-icon">⊙</span> Configuración
     </a>
   </nav>
-  <div class="sidebar-user">
-    <div class="user-avatar">GD</div>
+<div class="sidebar-user">
+    <div class="user-avatar" id="avatarIniciales">👤</div> 
     <div class="user-info">
-      <div class="user-name">Gerencia</div>
-      <div class="user-role">Administrador</div>
+      <div class="user-name" id="lblNombreUsuario">Cargando...</div>
+      <div class="user-role" id="lblRolUsuario" style="text-transform: capitalize;">...</div>
     </div>
   </div>
 
@@ -217,6 +217,19 @@ const NOMBRE_USUARIO = usuarioSesion.nombre;
 // ⚙️ INITIALIZACIÓN Y ADAPTACIÓN DE INTERFAZ
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
+
+  // Dentro de document.addEventListener("DOMContentLoaded", () => { ...
+document.getElementById('lblNombreUsuario').textContent = NOMBRE_USUARIO;
+
+// 🌟 EXTRA: Pintar el rol real en la interfaz
+if (document.getElementById('lblRolUsuario')) {
+    document.getElementById('lblRolUsuario').textContent = ROL_USUARIO;
+}
+
+// 🌟 EXTRA: Poner las 2 primeras letras de tu nombre como avatar
+if (document.getElementById('avatarIniciales')) {
+    document.getElementById('avatarIniciales').textContent = NOMBRE_USUARIO.slice(0, 2).toUpperCase();
+}
     console.log(`✨ Sesión activa: ${NOMBRE_USUARIO} (${ROL_USUARIO})`);
 
     // 1. Pintamos el nombre del usuario en el menú lateral de forma segura
