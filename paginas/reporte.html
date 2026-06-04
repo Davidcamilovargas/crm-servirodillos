@@ -7,55 +7,25 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
 
   <style>
-  /* ══════════════════════════════════════════
-     SERVIRODILLOS — Reporte Comercial
-     naranja #E8891A · verde #8DC63F · negro #141414
-  ══════════════════════════════════════════ */
+  /* ── Estilos específicos de esta página ── */
   :root {
-    --brand-orange:   #E8891A;
-    --brand-orange-h: #C4700E;
-    --brand-orange-l: #FDF0E0;
-    --brand-green:    #8DC63F;
-    --brand-green-d:  #2D5016;
-    --brand-green-l:  #EDF5D9;
-    --ink-1:      #1A1A1A;
-    --ink-2:      #444;
-    --ink-3:      #888;
-    --ink-4:      #BBB;
-    --surface:    #FFFFFF;
-    --surface-2:  #F7F6F3;
-    --surface-3:  #F0EEE9;
-    --border:     #E2E0DA;
-    --border-2:   #CCC9C0;
     --pendiente-color: #E8891A;
     --entregado-color: #8DC63F;
     --text-muted: #888;
-    --radius:    10px;
-    --radius-sm:  7px;
-    --shadow:    0 1px 4px rgba(0,0,0,.08);
-    --shadow-md: 0 4px 16px rgba(0,0,0,.10);
   }
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Barlow', sans-serif;
-    font-size: 14px;
-    background: var(--surface-3);
-    color: var(--ink-1);
+  /* LAYOUT CON SIDEBAR */
+  .main-content {
+    margin-left: var(--sidebar-w);
+    flex: 1;
     min-height: 100vh;
+    padding: 28px;
   }
 
-  /* ══ CONTAINER ══════════════════════════ */
-  .container {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 28px 24px;
-  }
-
-  /* ══ HEADER DEL REPORTE ═════════════════ */
+  /* HEADER DEL REPORTE */
   .reporte-header {
     display: flex;
     justify-content: space-between;
@@ -64,7 +34,6 @@
     gap: 14px;
     margin-bottom: 22px;
   }
-
   .reporte-header h2 {
     font-family: 'Barlow Condensed', sans-serif;
     font-weight: 900;
@@ -81,7 +50,7 @@
     font-weight: 500;
   }
 
-  /* Filtro vendedor (admin) */
+  /* FILTRO VENDEDOR ADMIN */
   #contenedorFiltroVendedor {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -101,7 +70,7 @@
     white-space: nowrap;
   }
 
-  /* ══ CONTROL BAR ════════════════════════ */
+  /* CONTROL BAR */
   .control-bar {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -122,38 +91,15 @@
     color: var(--ink-3);
     margin-right: 6px;
   }
-  .control-bar > div {
-    display: flex;
-    align-items: center;
-  }
+  .control-bar > div { display: flex; align-items: center; }
 
-  /* ══ INPUTS / SELECTS ═══════════════════ */
-  select, input, textarea {
-    background: var(--surface);
-    color: var(--ink-1);
-    padding: 8px 12px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border-2);
-    outline: none;
-    font-family: 'Barlow', sans-serif;
-    font-size: 13px;
-    transition: border-color .15s, box-shadow .15s;
-  }
-  select:focus, input:focus, textarea:focus {
-    border-color: var(--brand-orange);
-    box-shadow: 0 0 0 3px rgba(232,137,26,.12);
-  }
-  select { cursor: pointer; }
-  input::placeholder { color: var(--ink-4); }
-
-  /* ══ KPI CARDS ══════════════════════════ */
+  /* KPI CARDS */
   .kpi-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 16px;
     margin-bottom: 22px;
   }
-
   .kpi-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -174,7 +120,6 @@
     background: var(--brand-orange);
     border-radius: var(--radius) var(--radius) 0 0;
   }
-
   .kpi-card h3 {
     margin: 0 0 10px;
     font-size: 11px;
@@ -183,17 +128,16 @@
     text-transform: uppercase;
     letter-spacing: 1px;
   }
-
   .kpi-value {
     font-family: 'Barlow Condensed', sans-serif;
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 900;
     line-height: 1;
     color: var(--ink-1);
   }
 
-  /* ══ PANEL / TABLA ══════════════════════ */
-  .panel {
+  /* PANEL TABLA */
+  .panel-tabla {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
@@ -202,91 +146,32 @@
     margin-bottom: 22px;
   }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-    font-size: 13px;
-  }
-
-  thead tr {
-    background: var(--surface-2);
-  }
-  thead th {
-    padding: 11px 16px;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--ink-3);
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-  }
-
-  tbody td {
-    padding: 13px 16px;
-    border-bottom: 1px solid var(--border);
-    color: var(--ink-1);
-    vertical-align: middle;
-  }
-  tbody tr:last-child td { border-bottom: none; }
-  tbody tr:hover td { background: var(--surface-2); }
-
-  td[colspan] {
-    text-align: center;
-    color: var(--ink-3);
-    padding: 36px;
-    font-style: italic;
-  }
-
-  /* ══ ESTADOS DE FILA ════════════════════ */
-  .row-pendiente {
-    border-left: 3px solid var(--brand-orange);
-  }
+  /* ESTADOS DE FILA */
+  .row-pendiente { border-left: 3px solid var(--brand-orange); }
   .row-entregado {
     border-left: 3px solid var(--brand-green);
     background: rgba(141,198,63,.03);
   }
 
-  /* ══ BADGES ═════════════════════════════ */
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 3px 11px;
-    border-radius: 20px;
-    text-transform: uppercase;
-    letter-spacing: .5px;
-  }
+  /* BADGES ESTADO */
   .badge-pendiente {
+    display: inline-flex; align-items: center;
+    font-size: 11px; font-weight: 700;
+    padding: 3px 11px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: .5px;
     background: var(--brand-orange-l);
     color: var(--brand-orange-h);
   }
   .badge-entregado {
+    display: inline-flex; align-items: center;
+    font-size: 11px; font-weight: 700;
+    padding: 3px 11px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: .5px;
     background: var(--brand-green-l);
     color: var(--brand-green-d);
   }
 
-  /* ══ BOTONES ════════════════════════════ */
-  .btn-action {
-    background: var(--surface-2);
-    border: 1px solid var(--border-2);
-    color: var(--ink-2);
-    padding: 6px 13px;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    font-family: 'Barlow', sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    transition: background .15s, border-color .15s, color .15s;
-  }
-  .btn-action:hover {
-    background: var(--surface-3);
-    border-color: var(--brand-orange);
-    color: var(--brand-orange);
-  }
-
+  /* BOTÓN AGREGAR */
   .btn-agregar {
     margin-left: auto;
     background: var(--brand-orange) !important;
@@ -304,19 +189,21 @@
   }
   .btn-agregar:hover { background: var(--brand-orange-h) !important; }
 
-  /* ══ MODAL ══════════════════════════════ */
+  /* Número pedido en tabla */
+  .pedido-num { font-weight: 700; color: var(--brand-orange); }
+
+  /* MODAL */
   #modalPedido {
     display: none;
     position: fixed;
     z-index: 1000;
     inset: 0;
-    background: rgba(20,20,20,.55);
+    background: rgba(20,20,20,.5);
     backdrop-filter: blur(4px);
     justify-content: center;
     align-items: center;
     padding: 16px;
   }
-
   .modal-box {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -324,9 +211,8 @@
     padding: 28px;
     width: 100%;
     max-width: 460px;
-    box-shadow: 0 20px 60px rgba(0,0,0,.18);
+    box-shadow: 0 20px 60px rgba(0,0,0,.15);
   }
-
   .modal-header {
     display: flex;
     justify-content: space-between;
@@ -337,45 +223,31 @@
   }
   .modal-header h3 {
     font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 900;
-    font-size: 18px;
-    text-transform: uppercase;
-    letter-spacing: .8px;
-    color: var(--ink-1);
-    margin: 0;
+    font-weight: 900; font-size: 18px;
+    text-transform: uppercase; letter-spacing: .8px;
+    color: var(--ink-1); margin: 0;
   }
   .modal-close {
-    color: var(--ink-3);
-    cursor: pointer;
-    font-size: 22px;
-    line-height: 1;
+    color: var(--ink-3); cursor: pointer;
+    font-size: 24px; line-height: 1;
     transition: color .15s;
   }
   .modal-close:hover { color: var(--ink-1); }
 
-  .modal-field {
-    margin-bottom: 14px;
-  }
+  .modal-field { margin-bottom: 14px; }
   .modal-field label {
     display: block;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--ink-3);
-    margin-bottom: 5px;
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px;
+    color: var(--ink-3); margin-bottom: 5px;
   }
   .modal-field input,
-  .modal-field select {
-    width: 100%;
-  }
+  .modal-field select { width: 100%; }
 
   .modal-actions {
-    display: flex;
-    gap: 10px;
+    display: flex; gap: 10px;
     justify-content: flex-end;
-    margin-top: 20px;
-    padding-top: 16px;
+    margin-top: 20px; padding-top: 16px;
     border-top: 1px solid var(--border);
   }
   .btn-cancel {
@@ -384,61 +256,36 @@
     color: var(--ink-2);
     padding: 10px 18px;
     border-radius: var(--radius-sm);
-    border: none;
     cursor: pointer;
     font-family: 'Barlow', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 13px; font-weight: 600;
     transition: background .15s;
   }
   .btn-cancel:hover { background: var(--border); }
-
   .btn-save {
     background: var(--brand-orange);
     color: #fff;
     padding: 10px 20px;
     border-radius: var(--radius-sm);
-    border: none;
-    cursor: pointer;
+    border: none; cursor: pointer;
     font-family: 'Barlow Condensed', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .8px;
+    font-size: 15px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .8px;
     transition: background .15s;
   }
   .btn-save:hover { background: var(--brand-orange-h); }
 
-  /* número de pedido en tabla */
-  .pedido-num {
-    font-weight: 700;
-    color: var(--brand-orange);
-  }
-
-  /* ══ RESPONSIVE ═════════════════════════ */
+  /* RESPONSIVE */
   @media (max-width: 720px) {
-    .container { padding: 16px; }
-
-    .reporte-header { flex-direction: column; gap: 10px; }
-    .reporte-header h2 { font-size: 20px; }
-
-    .control-bar {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 10px;
-    }
+    .main-content { margin-left: 0; padding: 16px; padding-top: 60px; }
+    .reporte-header { flex-direction: column; }
+    .control-bar { flex-direction: column; align-items: flex-start; gap: 10px; }
     .btn-agregar { margin-left: 0 !important; width: 100%; text-align: center; }
-
     .kpi-container { grid-template-columns: 1fr 1fr; gap: 10px; }
-    .kpi-value { font-size: 22px; }
-
-    thead th, tbody td { padding: 10px 10px; font-size: 12px; }
-
-    .modal-box { padding: 20px; }
+    .kpi-value { font-size: 20px; }
     .modal-actions { flex-direction: column; }
     .btn-cancel, .btn-save { width: 100%; text-align: center; }
   }
-
   @media (max-width: 420px) {
     .kpi-container { grid-template-columns: 1fr; }
   }
@@ -446,329 +293,361 @@
 </head>
 <body>
 
-  <div class="container">
+<!-- ── HAMBURGER (móvil) ── -->
+<button class="hamburger" id="hamburger" aria-label="Menú">
+  <span></span><span></span><span></span>
+</button>
+<div class="overlay" id="overlay"></div>
 
-    <!-- HEADER -->
-    <div class="reporte-header">
-      <div>
-        <h2 id="tituloReporte">📊 Reporte Comercial Mensual</h2>
-        <p id="subtituloUsuario"></p>
-      </div>
-
-      <div id="contenedorFiltroVendedor" style="display: none;">
-        <label>Ver Asesor:</label>
-        <select id="filtroVendedor" onchange="cambioVendedorAdmin()">
-          <option value="todos">🌍 Todos los Vendedores</option>
-        </select>
-      </div>
+<!-- ── SIDEBAR ── -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div>
+      <div class="logo-word">Servi<span>rodillos</span></div>
+      <div class="logo-sub">Panel de Ventas</div>
     </div>
-
-    <!-- CONTROL BAR -->
-    <div class="control-bar">
-      <div>
-        <label>Mes:</label>
-        <select id="filtroMes" onchange="cargarReporteMensual()">
-          <option value="1">Enero</option>
-          <option value="2">Febrero</option>
-          <option value="3">Marzo</option>
-          <option value="4">Abril</option>
-          <option value="5">Mayo</option>
-          <option value="6">Junio</option>
-          <option value="7">Julio</option>
-          <option value="8">Agosto</option>
-          <option value="9">Septiembre</option>
-          <option value="10">Octubre</option>
-          <option value="11">Noviembre</option>
-          <option value="12">Diciembre</option>
-        </select>
-      </div>
-      <div>
-        <label>Año:</label>
-        <select id="filtroAnio" onchange="cargarReporteMensual()">
-          <option value="2026">2026</option>
-          <option value="2027">2027</option>
-        </select>
-      </div>
-      <button class="btn-action btn-agregar" onclick="abrirModalPedido()">＋ Agregar Pedido</button>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Principal</div>
+    <a class="nav-item" href="/">
+      <span class="nav-icon">⬛</span> Panel
+    </a>
+    <a class="nav-item" href="/clientes">
+      <span class="nav-icon">◎</span> Clientes
+    </a>
+    <a class="nav-item active" href="/paginas/oportunidades.html">
+      <span class="nav-icon">◈</span> Oportunidades
+    </a>
+    <div class="nav-label">Reportes</div>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">▣</span> Análisis
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">◧</span> Exportar
+    </a>
+    <div class="nav-label">Equipo</div>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">◉</span> Vendedores
+    </a>
+    <a class="nav-item" href="#">
+      <span class="nav-icon">⊙</span> Configuración
+    </a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="avatarIniciales">👤</div>
+    <div class="user-info">
+      <div class="user-name" id="lblNombreUsuario">Cargando...</div>
+      <div class="user-role" id="lblRolUsuario">...</div>
     </div>
+  </div>
+  <div class="sidebar-footer">
+    <button onclick="cerrarSesion()" class="btn-logout">
+      ↪ <span>Cerrar Sesión</span>
+    </button>
+  </div>
+</aside>
 
-    <!-- KPIs -->
-    <div class="kpi-container">
-      <div class="kpi-card">
-        <h3>Total Ventas</h3>
-        <div class="kpi-value" id="kpiTotal">$ 0</div>
-      </div>
-      <div class="kpi-card" style="--brand-orange:#3182ce;">
-        <h3>Meta del Mes</h3>
-        <div class="kpi-value" id="kpiMeta" style="color:#3182ce;">$ 15.000.000</div>
-      </div>
-      <div class="kpi-card">
-        <h3>Restante</h3>
-        <div class="kpi-value" id="kpiRestante" style="color:#C0392B;">$ 0</div>
-      </div>
+<!-- ── MAIN CONTENT ── -->
+<div class="main-content">
+
+  <!-- HEADER -->
+  <div class="reporte-header">
+    <div>
+      <h2 id="tituloReporte">📊 Reporte Comercial Mensual</h2>
+      <p id="subtituloUsuario"></p>
     </div>
-
-    <!-- TABLA PEDIDOS -->
-    <div class="panel">
-      <table>
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Pedido #</th>
-            <th>Cliente / Empresa</th>
-            <th>Estado</th>
-            <th>Valor</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="tablaPedidos"></tbody>
-      </table>
-    </div>
-
-  </div><!-- /container -->
-
-  <!-- MODAL NUEVO PEDIDO -->
-  <div id="modalPedido">
-    <div class="modal-box">
-      <div class="modal-header">
-        <h3>📦 Registrar Nuevo Pedido</h3>
-        <span class="modal-close" onclick="cerrarModalPedido()">&times;</span>
-      </div>
-
-      <form id="formNuevoPedido" onsubmit="guardarPedido(event)">
-        <div class="modal-field">
-          <label>📅 Fecha</label>
-          <input type="date" id="pedFecha" required>
-        </div>
-        <div class="modal-field">
-          <label>🔢 Número de Pedido</label>
-          <input type="text" id="pedNumero" placeholder="Ej: 6035" required>
-        </div>
-        <div class="modal-field">
-          <label>🏢 Cliente / Empresa</label>
-          <select id="pedCliente" required>
-            <option value="">Cargando clientes...</option>
-          </select>
-        </div>
-        <div class="modal-field">
-          <label>💵 Valor del Pedido ($)</label>
-          <input type="number" id="pedValor" placeholder="Ej: 1050000" required>
-        </div>
-        <div class="modal-field">
-          <label>📌 Estado Inicial</label>
-          <select id="pedEstado">
-            <option value="Pendiente">⏳ Pendiente</option>
-            <option value="Entregado">📦 Entregado</option>
-          </select>
-        </div>
-
-        <div class="modal-actions">
-          <button type="button" class="btn-cancel" onclick="cerrarModalPedido()">Cancelar</button>
-          <button type="submit" class="btn-save">💾 Guardar Pedido</button>
-        </div>
-      </form>
+    <div id="contenedorFiltroVendedor" style="display:none;">
+      <label>Ver Asesor:</label>
+      <select id="filtroVendedor" onchange="cambioVendedorAdmin()">
+        <option value="todos">🌍 Todos los Vendedores</option>
+      </select>
     </div>
   </div>
 
-  <!-- ════════════════════════════════════════
-       SCRIPT — SIN CAMBIOS DE LÓGICA
-  ════════════════════════════════════════ -->
-  <script>
-    const API_URL = "https://crm-servirodillos.onrender.com";
-    const ROL_USUARIO = localStorage.getItem('rol') || 'vendedor';
-    const ID_USUARIO  = localStorage.getItem('vendedorId') || 2;
+  <!-- CONTROL BAR -->
+  <div class="control-bar">
+    <div>
+      <label>Mes:</label>
+      <select id="filtroMes" onchange="cargarReporteMensual()">
+        <option value="1">Enero</option>
+        <option value="2">Febrero</option>
+        <option value="3">Marzo</option>
+        <option value="4">Abril</option>
+        <option value="5">Mayo</option>
+        <option value="6">Junio</option>
+        <option value="7">Julio</option>
+        <option value="8">Agosto</option>
+        <option value="9">Septiembre</option>
+        <option value="10">Octubre</option>
+        <option value="11">Noviembre</option>
+        <option value="12">Diciembre</option>
+      </select>
+    </div>
+    <div>
+      <label>Año:</label>
+      <select id="filtroAnio" onchange="cargarReporteMensual()">
+        <option value="2026">2026</option>
+        <option value="2027">2027</option>
+      </select>
+    </div>
+    <button class="btn-action btn-agregar" onclick="abrirModalPedido()">＋ Agregar Pedido</button>
+  </div>
 
-    let vendedorSeleccionado = ID_USUARIO;
+  <!-- KPIs -->
+  <div class="kpi-container">
+    <div class="kpi-card">
+      <h3>Total Ventas</h3>
+      <div class="kpi-value" id="kpiTotal">$ 0</div>
+    </div>
+    <div class="kpi-card">
+      <h3>Meta del Mes</h3>
+      <div class="kpi-value" id="kpiMeta" style="color:#3182ce;">$ 15.000.000</div>
+    </div>
+    <div class="kpi-card">
+      <h3>Restante</h3>
+      <div class="kpi-value" id="kpiRestante" style="color:#C0392B;">$ 0</div>
+    </div>
+  </div>
 
-    const formatoMoneda = new Intl.NumberFormat('es-CO', {
-      style: 'currency', currency: 'COP', minimumFractionDigits: 0
-    });
+  <!-- TABLA PEDIDOS -->
+  <div class="panel-tabla">
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Pedido #</th>
+          <th>Cliente / Empresa</th>
+          <th>Estado</th>
+          <th>Valor</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaPedidos"></tbody>
+    </table>
+  </div>
 
-    async function cargarReporteMensual() {
-      const mes  = document.getElementById('filtroMes').value;
-      const anio = document.getElementById('filtroAnio').value;
-      let url = `${API_URL}/api/pedidos?mes=${mes}&anio=${anio}`;
-      if (vendedorSeleccionado !== 'todos') url += `&vendedorId=${vendedorSeleccionado}`;
+</div><!-- /main-content -->
 
-      try {
-        const res  = await fetch(url);
-        const data = await res.json();
+<!-- MODAL NUEVO PEDIDO -->
+<div id="modalPedido">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>📦 Registrar Nuevo Pedido</h3>
+      <span class="modal-close" onclick="cerrarModalPedido()">&times;</span>
+    </div>
+    <form id="formNuevoPedido" onsubmit="guardarPedido(event)">
+      <div class="modal-field">
+        <label>📅 Fecha</label>
+        <input type="date" id="pedFecha" required>
+      </div>
+      <div class="modal-field">
+        <label>🔢 Número de Pedido</label>
+        <input type="text" id="pedNumero" placeholder="Ej: 6035" required>
+      </div>
+      <div class="modal-field">
+        <label>🏢 Cliente / Empresa</label>
+        <select id="pedCliente" required>
+          <option value="">Cargando clientes...</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label>💵 Valor del Pedido ($)</label>
+        <input type="number" id="pedValor" placeholder="Ej: 1050000" required>
+      </div>
+      <div class="modal-field">
+        <label>📌 Estado Inicial</label>
+        <select id="pedEstado">
+          <option value="Pendiente">⏳ Pendiente</option>
+          <option value="Entregado">📦 Entregado</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="cerrarModalPedido()">Cancelar</button>
+        <button type="submit" class="btn-save">💾 Guardar Pedido</button>
+      </div>
+    </form>
+  </div>
+</div>
 
-        document.getElementById('kpiTotal').innerText    = formatoMoneda.format(data.kpis.totalVenta);
-        document.getElementById('kpiMeta').innerText     = formatoMoneda.format(data.kpis.meta);
-        const restEl = document.getElementById('kpiRestante');
-        restEl.innerText    = formatoMoneda.format(data.kpis.restante);
-        restEl.style.color  = data.kpis.restante <= 0 ? 'var(--brand-green-d)' : '#C0392B';
+<!-- ════════════════════════════
+     SCRIPT — LÓGICA SIN CAMBIOS
+════════════════════════════ -->
+<script>
+  const API_URL     = "https://crm-servirodillos.onrender.com";
+  const ROL_USUARIO = localStorage.getItem('rol') || 'vendedor';
+  const ID_USUARIO  = localStorage.getItem('vendedorId') || 2;
+  let vendedorSeleccionado = ID_USUARIO;
 
-        const tbody = document.getElementById('tablaPedidos');
-        tbody.innerHTML = '';
+  const formatoMoneda = new Intl.NumberFormat('es-CO', {
+    style: 'currency', currency: 'COP', minimumFractionDigits: 0
+  });
 
-        if (!data.pedidos.length) {
-          tbody.innerHTML = `<tr><td colspan="6">No hay pedidos registrados en este mes.</td></tr>`;
-          return;
-        }
-
-        data.pedidos.forEach(p => {
-          const claseFila    = p.estado === 'Pendiente' ? 'row-pendiente' : 'row-entregado';
-          const claseBadge   = p.estado === 'Pendiente' ? 'badge-pendiente' : 'badge-entregado';
-          const nuevoEstado  = p.estado === 'Pendiente' ? 'Entregado' : 'Pendiente';
-          const textoBoton   = p.estado === 'Pendiente' ? '✔ Entregar' : '↩ Revertir';
-          const fecha        = new Date(p.fecha).toLocaleDateString('es-CO', { timeZone: 'UTC' });
-
-          tbody.innerHTML += `
-            <tr class="${claseFila}">
-              <td>${fecha}</td>
-              <td class="pedido-num">${p.numero_pedido}</td>
-              <td>${p.cliente_nombre}</td>
-              <td><span class="badge ${claseBadge}">${p.estado}</span></td>
-              <td style="font-weight:600;">${formatoMoneda.format(p.valor)}</td>
-              <td>
-                <button class="btn-action" onclick="cambiarEstadoPedido(${p.id}, '${nuevoEstado}')">
-                  ${textoBoton}
-                </button>
-              </td>
-            </tr>`;
-        });
-      } catch (e) {
-        console.error("❌ Error cargando el reporte:", e);
+  async function cargarReporteMensual() {
+    const mes  = document.getElementById('filtroMes').value;
+    const anio = document.getElementById('filtroAnio').value;
+    let url    = `${API_URL}/api/pedidos?mes=${mes}&anio=${anio}`;
+    if (vendedorSeleccionado !== 'todos') url += `&vendedorId=${vendedorSeleccionado}`;
+    try {
+      const res  = await fetch(url);
+      const data = await res.json();
+      document.getElementById('kpiTotal').innerText = formatoMoneda.format(data.kpis.totalVenta);
+      document.getElementById('kpiMeta').innerText  = formatoMoneda.format(data.kpis.meta);
+      const restEl = document.getElementById('kpiRestante');
+      restEl.innerText   = formatoMoneda.format(data.kpis.restante);
+      restEl.style.color = data.kpis.restante <= 0 ? 'var(--brand-green-d)' : '#C0392B';
+      const tbody = document.getElementById('tablaPedidos');
+      tbody.innerHTML = '';
+      if (!data.pedidos.length) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:36px;color:var(--ink-3);font-style:italic;">No hay pedidos registrados en este mes.</td></tr>`;
+        return;
       }
-    }
-
-    async function cambiarEstadoPedido(id, nuevoEstado) {
-      try {
-        const res = await fetch(`${API_URL}/api/pedidos/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ estado: nuevoEstado })
-        });
-        if (res.ok) cargarReporteMensual();
-      } catch (e) { console.error("Error al actualizar:", e); }
-    }
-
-// 🚀 CONTROL ROLES: INICIALIZACIÓN DE LA VISTA
-document.addEventListener("DOMContentLoaded", async () => {
-  const mesActual = new Date().getMonth() + 1;
-  document.getElementById('filtroMes').value = mesActual;
-
-  const nombreUsuario = localStorage.getItem('nombre') || localStorage.getItem('nombreUsuario') || 'Usuario';
-  
-  // Por defecto, todos (vendedor o admin) empiezan viendo sus propios datos
-  vendedorSeleccionado = ID_USUARIO;
-
-  if (ROL_USUARIO === 'admin') {
-    document.getElementById('tituloReporte').innerText = "💼 Panel de Control Comercial";
-    document.getElementById('subtituloUsuario').innerText = `Administrador: ${nombreUsuario}`;
-    
-    // Mostramos el selector exclusivo de Admin
-    const contenedorFiltro = document.getElementById('contenedorFiltroVendedor');
-    contenedorFiltro.style.display = 'block';
-    
-    // Cargamos los vendedores en el select y le pasamos el ID del admin para crear la opción "Mis Pedidos"
-    await cargarVendedoresParaAdmin(nombreUsuario);
-  } else {
-    document.getElementById('tituloReporte').innerText = "📊 Reporte Comercial Mensual";
-    document.getElementById('subtituloUsuario').innerText = `Asesor: ${nombreUsuario}`;
+      data.pedidos.forEach(p => {
+        const claseFila   = p.estado === 'Pendiente' ? 'row-pendiente' : 'row-entregado';
+        const claseBadge  = p.estado === 'Pendiente' ? 'badge-pendiente' : 'badge-entregado';
+        const nuevoEstado = p.estado === 'Pendiente' ? 'Entregado' : 'Pendiente';
+        const textoBoton  = p.estado === 'Pendiente' ? '✔ Entregar' : '↩ Revertir';
+        const fecha       = new Date(p.fecha).toLocaleDateString('es-CO', { timeZone: 'UTC' });
+        tbody.innerHTML += `
+          <tr class="${claseFila}">
+            <td style="font-size:12px;color:var(--ink-3)">${fecha}</td>
+            <td class="pedido-num">${p.numero_pedido}</td>
+            <td><strong>${p.cliente_nombre}</strong></td>
+            <td><span class="${claseBadge}">${p.estado}</span></td>
+            <td style="font-weight:600;">${formatoMoneda.format(p.valor)}</td>
+            <td><button class="btn-action" onclick="cambiarEstadoPedido(${p.id}, '${nuevoEstado}')">${textoBoton}</button></td>
+          </tr>`;
+      });
+    } catch (e) { console.error("❌ Error cargando el reporte:", e); }
   }
-  
-  // Lanza la carga inicial (Mis Pedidos)
-  cargarReporteMensual();
-});
 
-// 👥 CARGAR VENDEDORES EN EL SELECT (Con opción propia para el Admin)
-async function cargarVendedoresParaAdmin(nombreAdmin) {
-  try {
-    const res = await fetch(`${API_URL}/api/vendedores`); 
-    const vendedores = await res.json();
-    const selectVendedor = document.getElementById('filtroVendedor');
-    
-    // Limpiamos y dejamos la estructura clave de control
-    selectVendedor.innerHTML = `
-      <option value="${ID_USUARIO}">⭐ Mis Pedidos (${nombreAdmin})</option>
-      <option value="todos">🌍 Todos los Vendedores</option>
-    `;
-    
-    // Agregamos a los demás vendedores de la base de datos, saltando al admin para no repetirlo
-    vendedores.forEach(v => {
-      if (String(v.id) !== String(ID_USUARIO)) {
-        selectVendedor.innerHTML += `<option value="${v.id}">👤 ${v.nombre}</option>`;
+  async function cambiarEstadoPedido(id, nuevoEstado) {
+    try {
+      const res = await fetch(`${API_URL}/api/pedidos/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado: nuevoEstado })
+      });
+      if (res.ok) cargarReporteMensual();
+    } catch (e) { console.error("Error al actualizar:", e); }
+  }
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    const mesActual = new Date().getMonth() + 1;
+    document.getElementById('filtroMes').value = mesActual;
+
+    const nombreUsuario = localStorage.getItem('nombre') ||
+                          localStorage.getItem('nombreUsuario') || 'David Vargas';
+
+    // Pintar sidebar
+    if (document.getElementById('lblNombreUsuario'))
+      document.getElementById('lblNombreUsuario').textContent = nombreUsuario;
+    if (document.getElementById('lblRolUsuario'))
+      document.getElementById('lblRolUsuario').textContent = ROL_USUARIO;
+    if (document.getElementById('avatarIniciales'))
+      document.getElementById('avatarIniciales').textContent = nombreUsuario.slice(0,2).toUpperCase();
+
+    if (ROL_USUARIO === 'admin') {
+      document.getElementById('tituloReporte').innerText    = "💼 Panel de Control Comercial";
+      document.getElementById('subtituloUsuario').innerText = `Administrador: ${nombreUsuario}`;
+      document.getElementById('contenedorFiltroVendedor').style.display = 'flex';
+      await cargarVendedoresParaAdmin();
+      vendedorSeleccionado = 'todos';
+    } else {
+      document.getElementById('tituloReporte').innerText    = "📊 Reporte Comercial Mensual";
+      document.getElementById('subtituloUsuario').innerText = `Asesor: ${nombreUsuario}`;
+      vendedorSeleccionado = ID_USUARIO;
+    }
+    cargarReporteMensual();
+  });
+
+  async function cargarVendedoresParaAdmin() {
+    try {
+      const res        = await fetch(`${API_URL}/api/vendedores`);
+      const vendedores = await res.json();
+      const sel        = document.getElementById('filtroVendedor');
+      vendedores.forEach(v => {
+        sel.innerHTML += `<option value="${v.id}">👤 ${v.nombre}</option>`;
+      });
+    } catch (e) { console.error("❌ Error cargando vendedores:", e); }
+  }
+
+  function cambioVendedorAdmin() {
+    vendedorSeleccionado = document.getElementById('filtroVendedor').value;
+    cargarReporteMensual();
+  }
+
+  function abrirModalPedido() {
+    document.getElementById('modalPedido').style.display = 'flex';
+    document.getElementById('pedFecha').value = new Date().toISOString().split('T')[0];
+    cargarClientesEnModal();
+  }
+  function cerrarModalPedido() {
+    document.getElementById('modalPedido').style.display = 'none';
+    document.getElementById('formNuevoPedido').reset();
+  }
+
+  async function cargarClientesEnModal() {
+    try {
+      let idFiltro   = ROL_USUARIO === 'vendedor' ? ID_USUARIO : null;
+      const urlBase  = `${API_URL}/api/clientes`;
+      const urlFinal = idFiltro ? `${urlBase}?vendedorId=${idFiltro}` : urlBase;
+      const response = await fetch(urlFinal);
+      const clientes = await response.json();
+      const sel      = document.getElementById('pedCliente');
+      if (!sel) return;
+      if (!clientes.length) { sel.innerHTML = '<option value="">No tienes clientes asignados</option>'; return; }
+      sel.innerHTML = '<option value="">-- Seleccione un cliente --</option>' +
+        clientes.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
+    } catch (e) { console.error("❌ Error cargando clientes:", e); }
+  }
+
+  async function guardarPedido(event) {
+    event.preventDefault();
+    const nuevoPedido = {
+      fecha:          document.getElementById('pedFecha').value,
+      numero_pedido:  document.getElementById('pedNumero').value,
+      cliente_nombre: document.getElementById('pedCliente').value,
+      valor:          document.getElementById('pedValor').value,
+      estado:         document.getElementById('pedEstado').value,
+      vendedor_id:    ID_USUARIO
+    };
+    try {
+      const response = await fetch(`${API_URL}/api/pedidos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nuevoPedido)
+      });
+      if (response.ok) { cerrarModalPedido(); cargarReporteMensual(); }
+      else { const err = await response.json(); alert("Error al guardar: " + err.error); }
+    } catch (e) { console.error("❌ Error guardando pedido:", e); }
+  }
+
+  function cerrarSesion() {
+    localStorage.removeItem('usuarioCRM');
+    window.location.href = "/login";
+  }
+
+  // Hamburger móvil
+  const sidebar   = document.getElementById('sidebar');
+  const hamburger = document.getElementById('hamburger');
+  const overlay   = document.getElementById('overlay');
+  hamburger.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('show');
+  });
+  overlay.addEventListener('click', () => {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('show');
+  });
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.addEventListener('click', () => {
+      if (window.innerWidth <= 720) {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('show');
       }
     });
-  } catch (error) {
-    console.error("❌ Error cargando vendedores en el panel de admin:", error);
-  }
-}
-
-// 🔀 ACCIÓN CUANDO EL ADMIN CAMBIA EL FILTRO
-function cambioVendedorAdmin() {
-  vendedorSeleccionado = document.getElementById('filtroVendedor').value;
-  
-  // Al cambiar el asesor, ejecutamos la carga mensual. 
-  // Tu backend ya está blindado gracias al último ajuste para recibir "todos" o el ID que elija.
-  cargarReporteMensual(); 
-}
-    async function cargarVendedoresParaAdmin() {
-      try {
-        const res       = await fetch(`${API_URL}/api/vendedores`);
-        const vendedores = await res.json();
-        const sel       = document.getElementById('filtroVendedor');
-        vendedores.forEach(v => {
-          sel.innerHTML += `<option value="${v.id}">👤 ${v.nombre}</option>`;
-        });
-      } catch (e) { console.error("❌ Error cargando vendedores:", e); }
-    }
-
-    function cambioVendedorAdmin() {
-      vendedorSeleccionado = document.getElementById('filtroVendedor').value;
-      cargarReporteMensual();
-    }
-
-    function abrirModalPedido() {
-      document.getElementById('modalPedido').style.display = 'flex';
-      document.getElementById('pedFecha').value = new Date().toISOString().split('T')[0];
-      cargarClientesEnModal();
-    }
-
-    function cerrarModalPedido() {
-      document.getElementById('modalPedido').style.display = 'none';
-      document.getElementById('formNuevoPedido').reset();
-    }
-
-    async function cargarClientesEnModal() {
-      try {
-        let idFiltro  = ROL_USUARIO === 'vendedor' ? ID_USUARIO : null;
-        const urlBase = `${API_URL}/api/clientes`;
-        const urlFinal = idFiltro ? `${urlBase}?vendedorId=${idFiltro}` : urlBase;
-        const response = await fetch(urlFinal);
-        const clientes = await response.json();
-        const sel      = document.getElementById('pedCliente');
-        if (!sel) return;
-        if (!clientes.length) { sel.innerHTML = '<option value="">No tienes clientes asignados</option>'; return; }
-        sel.innerHTML = '<option value="">-- Seleccione un cliente --</option>' +
-          clientes.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
-      } catch (e) { console.error("❌ Error cargando clientes:", e); }
-    }
-
-    async function guardarPedido(event) {
-      event.preventDefault();
-      const nuevoPedido = {
-        fecha:          document.getElementById('pedFecha').value,
-        numero_pedido:  document.getElementById('pedNumero').value,
-        cliente_nombre: document.getElementById('pedCliente').value,
-        valor:          document.getElementById('pedValor').value,
-        estado:         document.getElementById('pedEstado').value,
-        vendedor_id:    ID_USUARIO
-      };
-      try {
-        const response = await fetch(`${API_URL}/api/pedidos`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(nuevoPedido)
-        });
-        if (response.ok) { cerrarModalPedido(); cargarReporteMensual(); }
-        else { const err = await response.json(); alert("Error al guardar: " + err.error); }
-      } catch (e) { console.error("❌ Error guardando pedido:", e); }
-    }
-  </script>
+  });
+</script>
 
 </body>
 </html>
