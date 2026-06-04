@@ -119,40 +119,44 @@
     <div class="two-col">
 
       <!-- FORM -->
-      <div class="panel">
-        <div class="panel-header">
-          <div class="panel-title"><span class="dot"></span>Registrar actividad</div>
-        </div>
-        <div class="panel-body">
-          <div class="form-grid">
-            <div class="form-field">
-              <label>Vendedor</label>
-              <select id="vendedor">
-                <option value="">Seleccione un vendedor...</option>
-              </select>
-            </div>
-            <div class="form-field">
-              <label>Tipo de actividad</label>
-              <select id="tipoActividad">
-                <option value="llamada">☎ Llamada telefónica</option>
-                <option value="mensaje">✉ Mensaje / Email</option>
-                <option value="visita">🚗 Visita presencial</option>
-              </select>
-            </div>
-            <div class="form-field full">
-              <label>Cliente / Empresa</label>
-              <input type="text" id="cliente" placeholder="Nombre de la empresa o contacto">
-            </div>
-            <div class="form-field full">
-              <label>Notas de la actividad</label>
-              <textarea id="notas" placeholder="Resumen de la conversación, acuerdos, próximos pasos..."></textarea>
-            </div>
-          </div>
-          <button class="btn-submit" onclick="registrarActividad()">
-            <span class="btn-icon">＋</span> Guardar actividad
-          </button>
-        </div>
+<div class="panel">
+  <div class="panel-header">
+    <div class="panel-title"><span class="dot"></span>Registrar actividad</div>
+  </div>
+  <div class="panel-body">
+    <div class="form-grid">
+      <div class="form-field">
+        <label>Vendedor</label>
+        <select id="vendedor">
+          <option value="">Seleccione un vendedor...</option>
+        </select>
       </div>
+      <div class="form-field">
+        <label>Tipo de actividad</label>
+        <select id="tipoActividad">
+          <option value="llamada">☎ Llamada telefónica</option>
+          <option value="mensaje">✉ Mensaje / Email</option>
+          <option value="visita">🚗 Visita presencial</option>
+        </select>
+      </div>
+      
+      <div class="form-field full">
+        <label>Cliente / Empresa</label>
+        <select id="cliente" style="width: 100%; background: var(--bg-2, #1a1c24); color: #fff; padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); outline: none; cursor: pointer;">
+          <option value="">Cargando clientes asignados...</option>
+        </select>
+      </div>
+      
+      <div class="form-field full">
+        <label>Notas de la actividad</label>
+        <textarea id="notas" placeholder="Resumen de la conversación, acuerdos, próximos pasos..."></textarea>
+      </div>
+    </div>
+    <button class="btn-submit" onclick="registrarActividad()">
+      <span class="btn-icon">＋</span> Guardar actividad
+    </button>
+  </div>
+</div>
 
       <!-- BALANCE -->
       <div class="panel">
@@ -218,18 +222,7 @@ const NOMBRE_USUARIO = usuarioSesion.nombre;
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
 
-  // Dentro de document.addEventListener("DOMContentLoaded", () => { ...
-document.getElementById('lblNombreUsuario').textContent = NOMBRE_USUARIO;
-
-// 🌟 EXTRA: Pintar el rol real en la interfaz
-if (document.getElementById('lblRolUsuario')) {
-    document.getElementById('lblRolUsuario').textContent = ROL_USUARIO;
-}
-
-// 🌟 EXTRA: Poner las 2 primeras letras de tu nombre como avatar
-if (document.getElementById('avatarIniciales')) {
-    document.getElementById('avatarIniciales').textContent = NOMBRE_USUARIO.slice(0, 2).toUpperCase();
-}
+  
     console.log(`✨ Sesión activa: ${NOMBRE_USUARIO} (${ROL_USUARIO})`);
 
     // 1. Pintamos el nombre del usuario en el menú lateral de forma segura
@@ -255,6 +248,7 @@ if (document.getElementById('avatarIniciales')) {
     // 3. Ejecutamos las llamadas iniciales
     obtenerBalance();
     obtenerHistorial();
+    cargarClientesEnFormulario(); // Cargamos los clientes en el formulario al inicio
 });
 
 // 🌟 FUNCIÓN GLOBAL PARA CERRAR SESIÓN (Para el botón del menú)
@@ -456,6 +450,37 @@ function cerrarSesion() {
       toast('No se pudo conectar al servidor.', false);
     }
   }
+
+  // 🏢 FUNCIÓN PARA CARGAR LOS CLIENTES EN EL FORMULARIO
+async function cargarClientesEnFormulario() {
+    try {
+        // Si el usuario ingresado es vendedor, se le filtran solo sus clientes
+        let idFiltro = ROL_USUARIO === 'vendedor' ? ID_USUARIO : null;
+
+        const urlBase = `${API_URL}/api/clientes`;
+        const urlFinal = idFiltro ? `${urlBase}?vendedorId=${idFiltro}` : urlBase;
+
+        const response = await fetch(urlFinal);
+        const clientes = await response.json();
+        const selectCliente = document.getElementById('cliente');
+
+        if (!selectCliente) return;
+
+        if (!clientes.length) {
+            selectCliente.innerHTML = '<option value="">No tienes clientes asignados</option>';
+            return;
+        }
+
+        // Cargamos los nombres de las empresas directo en las opciones
+        selectCliente.innerHTML = '<option value="">Seleccione un cliente...</option>' + 
+            clientes.map(c => `
+                <option value="${c.nombre}">${c.nombre}</option>
+            `).join('');
+
+    } catch (error) {
+        console.error("❌ Error cargando clientes en el formulario:", error);
+    }
+}
 
 
 // ==========================================
