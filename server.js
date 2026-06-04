@@ -13,6 +13,9 @@ app.use(express.json());
 // Sirve todos los archivos de tu carpeta (CSS, JS del cliente, imágenes)
 app.use(express.static(__dirname));
 
+// Aseguramos la ruta del CSS para evitar bloqueos de tipo MIME en subcarpetas virtuales
+app.use('/css', express.static(path.join(__dirname, 'css')));
+
 // Ruta para enviar el HTML principal al entrar a la raíz "/"
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html')); 
@@ -26,7 +29,7 @@ app.get('/login', (req, res) => {
 // Ruta para la pantalla de Clientes
 app.get('/clientes', (req, res) => {
     res.sendFile(path.join(__dirname, 'paginas', 'clientes.html'));
-})
+});
 
 // Ruta para la pantalla de Reporte
 app.get('/reporte', (req, res) => {
@@ -34,11 +37,10 @@ app.get('/reporte', (req, res) => {
 });
 
 // --- 🛠️ CONFIGURACIÓN DE LA BASE DE DATOS CON POOL INTELIGENTE ---
-// Usamos 'createPool' para que la conexión no se muera por inactividad por las mañanas
 const db = mysql.createPool({
     host: process.env.DB_HOST || "mysql-2d9ef1b2-davidleon1004-b427.l.aivencloud.com",
     user: process.env.DB_USER || "avnadmin",
-    password: process.env.DB_PASSWORD || "TU_CONTRASEÑA_DE_AIVEN", // Reemplaza con tu contraseña real de Aiven
+    password: process.env.DB_PASSWORD || "TU_CONTRASEÑA_DE_AIVEN", // Recuerda poner tu clave real aquí
     database: process.env.DB_NAME || "defaultdb",
     port: process.env.DB_PORT || 12345,
     waitForConnections: true,
@@ -48,8 +50,6 @@ const db = mysql.createPool({
         rejectUnauthorized: false
     }
 });
-
-// NOTA: Con createPool NO se usa db.connect(), el pool abre y cierra conexiones automáticamente.
 
 
 // --- 🔒 RUTA: INICIO DE SESIÓN (POST) ---
@@ -81,7 +81,7 @@ app.post('/api/login', (req, res) => {
                 id: usuario.id,
                 nombre: usuario.nombre,
                 email: usuario.email,
-                rol: usuario.rol
+                role: usuario.rol
             }
         });
     });
@@ -89,7 +89,6 @@ app.post('/api/login', (req, res) => {
 
 
 // --- 📊 RUTA: VER BALANCE (GET) ---
-// Filtra dinámicamente: Si llega '?vendedorId=X' calcula solo lo de ese vendedor. Si no, trae todo.
 app.get('/api/balance', (req, res) => {
     const { vendedorId } = req.query; 
 
@@ -128,7 +127,6 @@ app.get('/api/balance', (req, res) => {
 
 
 // --- 📜 RUTA: VER HISTORIAL (GET) ---
-// Si llega '?vendedorId=X' restringe el historial para que el vendedor solo vea lo suyo.
 app.get('/api/historial', (req, res) => {
     const { vendedorId } = req.query;
 
@@ -183,7 +181,6 @@ app.post('/api/registrar', (req, res) => {
 
 
 // --- 👥 RUTA: LISTAR VENDEDORES (GET) ---
-// Útil para llenar los selectores en la vista del administrador
 app.get('/api/vendedores', (req, res) => {
     const sql = "SELECT id, nombre FROM vendedores ORDER BY nombre ASC";
     db.query(sql, (err, results) => {
@@ -195,96 +192,102 @@ app.get('/api/vendedores', (req, res) => {
     });
 });
 
+
 // ==========================================
-// 📊 ENDPOINTS REPORTE COMERCIAL MENSUAL
+// 📊 ENDPOINTS REPORTE COMERCIAL MENSUAL (CON CALLBACKS)
 // ==========================================
 
 // 1. REGISTRAR UN NUEVO PEDIDO
-app.post('/api/pedidos', async (req, res) => {
+app.post('/api/pedidos', (req, res) => {
     const { fecha, numero_pedido, cliente_nombre, estado, valor, vendedor_id } = req.body;
+    
     if (!fecha || !numero_pedido || !cliente_nombre || !valor || !vendedor_id) {
         return res.status(400).json({ error: 'Faltan campos obligatorios.' });
     }
-    try {
-        const query = `INSERT INTO pedidos (fecha, numero_pedido, cliente_nombre, estado, valor, vendedor_id) VALUES (?, ?, ?, ?, ?, ?)`;
-        const [result] = await db.query(query, [fecha, numero_pedido, cliente_nombre, estado || 'Pendiente', valor, vendedor_id]);
+
+    const query = `INSERT INTO pedidos (fecha, numero_pedido, cliente_nombre, estado, valor, vendedor_id) VALUES (?, ?, ?, ?, ?, ?)`;
+    
+    db.query(query, [fecha, numero_pedido, cliente_nombre, estado || 'Pendiente', valor, vendedor_id], (err, result) => {
+        if (err) {
+            console.error("❌ Error al guardar pedido:", err);
+            return res.status(500).json({ error: 'Error al guardar pedido' });
+        }
         res.status(201).json({ message: 'Pedido registrado', id: result.insertId });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error al guardar pedido' });
-    }
+    });
 });
 
-// 2. OBTENER PEDIDOS FILTRADOS POR MES, AÑO Y VENDEDOR + KPIs
-app.get('/api/pedidos', async (req, res) => {
+// 2. OBTENER PEDIDOS FILTRADOS POR MES, AÑO Y VENDEDOR + KPIs (CORREGIDO)
+app.get('/api/pedidos', (req, res) => {
     const { vendedorId, mes, anio } = req.query; 
     
     const fechaActual = new Date();
     const filtroMes = mes ? parseInt(mes) : (fechaActual.getMonth() + 1);
     const filtroAnio = anio ? parseInt(anio) : fechaActual.getFullYear();
 
-    try {
-        // Formateamos el inicio y fin del mes en formato 'YYYY-MM-DD' para que MySQL no falle nunca
-        const fechaInicio = `${filtroAnio}-${String(filtroMes).padStart(2, '0')}-01`;
-        const fechaFin = `${filtroAnio}-${String(filtroMes).padStart(2, '0')}-31`; // MySQL entiende el rango
+    const fechaInicio = `${filtroAnio}-${String(filtroMes).padStart(2, '0')}-01`;
+    const fechaFin = `${filtroAnio}-${String(filtroMes).padStart(2, '0')}-31`;
 
-        let query = `SELECT * FROM pedidos WHERE fecha BETWEEN ? AND ?`;
-        let params = [fechaInicio, fechaFin];
+    let query = `SELECT * FROM pedidos WHERE fecha BETWEEN ? AND ?`;
+    let params = [fechaInicio, fechaFin];
 
-        if (vendedorId && vendedorId !== 'null' && vendedorId !== 'undefined') {
-            query += ` AND vendedor_id = ?`;
-            params.push(vendedorId);
+    // Validación inteligente para discriminar "todos", nulos o indefinidos
+    if (vendedorId && vendedorId !== 'todos' && vendedorId !== 'null' && vendedorId !== 'undefined') {
+        query += ` AND vendedor_id = ?`;
+        params.push(vendedorId);
+    }
+
+    query += ` ORDER BY fecha DESC`;
+
+    db.query(query, params, (err, pedidos) => {
+        if (err) {
+            console.error('❌ Error en el servidor de base de datos:', err);
+            return res.status(500).json({ error: 'Error interno al cargar el reporte comercial', detalle: err.message });
         }
 
-        query += ` ORDER BY fecha DESC`;
-        const [pedidos] = await db.query(query, params);
-
-        // Calculamos los totales con seguridad
+        // Calculamos los totales recorriendo el array de forma segura
         const totalVenta = pedidos.reduce((sum, p) => sum + parseFloat(p.valor || 0), 0);
         const META_MES = 15000000; 
         const restante = META_MES - totalVenta;
 
         res.json({
-            pedidos,
+            pedidos: pedidos,
             kpis: { totalVenta, meta: META_MES, restante }
         });
-    } catch (error) {
-        console.error('❌ Error real en el servidor:', error);
-        res.status(500).json({ error: 'Error interno al cargar el reporte comercial', detalle: error.message });
-    }
+    });
 });
+
 // 3. EDITAR ESTADO DE UN PEDIDO (Pendiente <-> Entregado)
-app.put('/api/pedidos/:id', async (req, res) => {
+app.put('/api/pedidos/:id', (req, res) => {
     const { id } = req.params;
-    const { estado } = req.body; // Recibe 'Pendiente' o 'Entregado'
+    const { estado } = req.body;
 
     if (!estado) return res.status(400).json({ error: 'El estado es requerido.' });
 
-    try {
-        const query = `UPDATE pedidos SET estado = ? WHERE id = ?`;
-        await db.query(query, [estado, id]);
+    const query = `UPDATE pedidos SET estado = ? WHERE id = ?`;
+    
+    db.query(query, [estado, id], (err, result) => {
+        if (err) {
+            console.error("❌ Error al actualizar estado del pedido:", err);
+            return res.status(500).json({ error: 'Error al actualizar el estado del pedido' });
+        }
         res.json({ message: 'Pedido actualizado con éxito' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error al actualizar el estado del pedido' });
-    }
+    });
 });
+
 
 // 🏢 ENDPOINT: OBTENER LISTA DE CLIENTES FILTRADA POR ROL
 // ==========================================
 app.get('/api/clientes', (req, res) => {
-    const { vendedorId } = req.query; // Captura el ID si viene desde el frontend
+    const { vendedorId } = req.query; 
 
     let query = 'SELECT * FROM clientes';
     const queryParams = [];
 
-    // Si viene un vendedorId en la petición, filtramos la base de datos
     if (vendedorId) {
         query += ' WHERE vendedor_id = ?';
         queryParams.push(vendedorId);
     }
 
-    // Ordenamos alfabéticamente para que en los selects aparezcan organizados
     query += ' ORDER BY nombre ASC';
 
     db.query(query, queryParams, (err, results) => {

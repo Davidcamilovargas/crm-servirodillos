@@ -4,8 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CRM Servirodillos - Reporte Comercial</title>
-  <link rel="stylesheet" href="../css/styles.css"> <!-- Tu archivo de estilos global -->
-  <style>
+  <link rel="stylesheet" href="/css/styles.css"> <style>
     /* Estilos base con la estética del proyecto */
     :root {
       --bg-principal: #0f111a;
@@ -29,7 +28,7 @@
       margin: 0 auto;
     }
 
-    /* 📊 TARJETAS DE INDICADORES (IGUAL AL EXCEL) */
+    /* 📊 TARJETAS DE INDICADORES */
     .kpi-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -60,7 +59,7 @@
       font-weight: bold;
     }
 
-    /* Barra de filtros de fecha */
+    /* Barra de filtros de fecha y roles */
     .control-bar {
       background: var(--glass-bg);
       border: 1px solid var(--border-neon);
@@ -82,14 +81,14 @@
       outline: none;
     }
 
-    /* 🟢 ESTADOS DE FILAS (Estilo visual diferenciado) */
+    /* 🟢 ESTADOS DE FILAS */
     .row-pendiente {
       border-left: 4px solid var(--pendiente-color);
     }
 
     .row-entregado {
       border-left: 4px solid var(--entregado-color);
-      background: rgba(0, 0, 0, 0.2); /* Más oscura como en tu Excel */
+      background: rgba(0, 0, 0, 0.2); 
     }
 
     .badge {
@@ -116,9 +115,21 @@
 <body>
 
   <div class="container">
-    <h2>📊 Reporte Comercial Mensual</h2>
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+      <div>
+        <h2 id="tituloReporte" style="margin: 0; color: #fff;">📊 Reporte Comercial Mensual</h2>
+        <p id="subtituloUsuario" style="margin: 5px 0 0 0; color: var(--text-muted); font-size: 1.1rem; font-weight: 500;"></p>
+      </div>
+      
+      <div id="contenedorFiltroVendedor" style="display: none; background: var(--glass-bg); padding: 10px 15px; border-radius: 12px; border: 1px solid var(--border-neon);">
+        <label style="color: var(--text-muted); margin-right: 8px; font-size: 0.9rem;">Ver Asesor:</label>
+        <select id="filtroVendedor" onchange="cambioVendedorAdmin()" style="padding: 5px 10px;">
+          <option value="todos">🌍 Todos los Vendedores</option>
+        </select>
+      </div>
+    </div>
 
-    <!-- 🕒 CONTROL DE FILTRADO MENSUAL -->
     <div class="control-bar">
       <div>
         <label style="color: var(--text-muted); margin-right: 8px;">Mes:</label>
@@ -128,7 +139,7 @@
           <option value="3">Marzo</option>
           <option value="4">Abril</option>
           <option value="5">Mayo</option>
-          <option value="6" selected>Junio</option> <!-- Mes actual -->
+          <option value="6">Junio</option>
           <option value="7">Julio</option>
           <option value="8">Agosto</option>
           <option value="9">Septiembre</option>
@@ -141,7 +152,7 @@
       <div>
         <label style="color: var(--text-muted); margin-right: 8px;">Año:</label>
         <select id="filtroAnio" onchange="cargarReporteMensual()">
-          <option value="2026" selected>2026</option>
+          <option value="2026">2026</option>
           <option value="2027">2027</option>
         </select>
       </div>
@@ -149,7 +160,6 @@
       <button class="btn-action" style="margin-left: auto; background: #3182ce;" onclick="abrirModalPedido()">＋ Agregar Pedido</button>
     </div>
 
-    <!-- 📈 TARJETAS DE METAS E INDICADORES -->
     <div class="kpi-container">
       <div class="kpi-card">
         <h3>Total Ventas</h3>
@@ -165,7 +175,6 @@
       </div>
     </div>
 
-    <!-- 📋 TABLA DE PEDIDOS -->
     <div class="panel" style="background: var(--glass-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border-neon);">
       <table style="width: 100%; border-collapse: collapse; text-align: left;">
         <thead>
@@ -179,50 +188,89 @@
           </tr>
         </thead>
         <tbody id="tablaPedidos">
-          <!-- Cargado dinámicamente por JS -->
-        </tbody>
+          </tbody>
       </table>
     </div>
   </div>
 
-  <!-- 🧠 LÓGICA DE JAVASCRIPT CONECTADA AL BACKEND -->
-  <script>
-    // Configuración inicial compartida de tu sesión
-    const API_URL = "https://crm-servirodillos.onrender.com"; // Ajusta a tu URL real
-    const ROL_USUARIO = localStorage.getItem('rol') || 'vendedor'; 
-    const ID_USUARIO = localStorage.getItem('vendedorId') || 2; // David por defecto
+  <div id="modalPedido" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); backdrop-filter: blur(5px); justify-content: center; align-items: center;">
+    <div style="background: #1a1c24; border: 1px solid rgba(255,255,255,0.1); padding: 25px; border-radius: 12px; width: 100%; max-width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+        <h3 style="margin: 0; color: #fff;">📦 Registrar Nuevo Pedido</h3>
+        <span onclick="cerrarModalPedido()" style="color: #a0aec0; cursor: pointer; font-size: 1.5rem;">&times;</span>
+      </div>
 
-    // Formateador de moneda (Evita errores visuales)
+      <form id="formNuevoPedido" onsubmit="guardarPedido(event)">
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; color: #a0aec0; margin-bottom: 5px; font-size: 0.9rem;">📅 Fecha:</label>
+          <input type="date" id="pedFecha" required style="width: 100%; box-sizing: border-box;">
+        </div>
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; color: #a0aec0; margin-bottom: 5px; font-size: 0.9rem;">🔢 Número de Pedido:</label>
+          <input type="text" id="pedNumero" placeholder="Ej: 6035" required style="width: 100%; box-sizing: border-box;">
+        </div>
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; color: #a0aec0; margin-bottom: 5px; font-size: 0.9rem;">🏢 Cliente / Empresa:</label>
+          <select id="pedCliente" required style="width: 100%; box-sizing: border-box;">
+            <option value="">Cargando clientes...</option>
+          </select>
+        </div>
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; color: #a0aec0; margin-bottom: 5px; font-size: 0.9rem;">💵 Valor del Pedido ($):</label>
+          <input type="number" id="pedValor" placeholder="Ej: 1050000" required style="width: 100%; box-sizing: border-box;">
+        </div>
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; color: #a0aec0; margin-bottom: 5px; font-size: 0.9rem;">📌 Estado Inicial:</label>
+          <select id="pedEstado" style="width: 100%; box-sizing: border-box;">
+            <option value="Pendiente">⏳ Pendiente</option>
+            <option value="Entregado">📦 Entregado</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+          <button type="button" onclick="cerrarModalPedido()" style="background: #2d3748; color: white; padding: 10px 15px; border-radius: 6px; border: none; cursor: pointer;">Cancelar</button>
+          <button type="submit" style="background: #3182ce; color: white; padding: 10px 15px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold;">💾 Guardar Pedido</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "https://crm-servirodillos.onrender.com"; 
+    const ROL_USUARIO = localStorage.getItem('rol') || 'vendedor'; 
+    const ID_USUARIO = localStorage.getItem('vendedorId') || 2; 
+    
+    // Controlará el ID a consultar en la API
+    let vendedorSeleccionado = ID_USUARIO;
+
     const formatoMoneda = new Intl.NumberFormat('es-CO', {
       style: 'currency',
       currency: 'COP',
       minimumFractionDigits: 0
     });
 
+    // 🔄 REPORTE MENSUAL INTEGRADOR
     async function cargarReporteMensual() {
       const mes = document.getElementById('filtroMes').value;
       const anio = document.getElementById('filtroAnio').value;
       
-      // Si eres vendedor, te auto-filtramos por tu ID
       let url = `${API_URL}/api/pedidos?mes=${mes}&anio=${anio}`;
-      if (ROL_USUARIO === 'vendedor') {
-        url += `&vendedorId=${ID_USUARIO}`;
+      
+      // Si el filtro no está en "todos", añadimos el ID correspondiente
+      if (vendedorSeleccionado !== 'todos') {
+        url += `&vendedorId=${vendedorSeleccionado}`;
       }
 
       try {
         const res = await fetch(url);
         const data = await res.json();
 
-        // 1. Pintar Indicadores (KPIs)
         document.getElementById('kpiTotal').innerText = formatoMoneda.format(data.kpis.totalVenta);
         document.getElementById('kpiMeta').innerText = formatoMoneda.format(data.kpis.meta);
         
         const restanteElement = document.getElementById('kpiRestante');
         restanteElement.innerText = formatoMoneda.format(data.kpis.restante);
-        // Si ya pasaste la meta, se pone verde, si no, se queda en rojo
         restanteElement.style.color = data.kpis.restante <= 0 ? '#48bb78' : '#e53e3e';
 
-        // 2. Pintar Tabla de filas
         const tbody = document.getElementById('tablaPedidos');
         tbody.innerHTML = '';
 
@@ -236,8 +284,6 @@
           const claseBadge = p.estado === 'Pendiente' ? 'badge-pendiente' : 'badge-entregado';
           const nuevoEstadoDestino = p.estado === 'Pendiente' ? 'Entregado' : 'Pendiente';
           const textoBoton = p.estado === 'Pendiente' ? '✔ Entregar' : '↩ Revertir';
-
-          // Cambiamos el formato de la fecha que viene de la BD a algo amigable
           const fechaFormateada = new Date(p.fecha).toLocaleDateString('es-CO', { timeZone: 'UTC' });
 
           tbody.innerHTML += `
@@ -255,13 +301,11 @@
             </tr>
           `;
         });
-
       } catch (error) {
         console.error("❌ Error cargando el reporte:", error);
       }
     }
 
-    // FUNCIÓN PARA EDITAR EL ESTADO DESDE LA TABLA
     async function cambiarEstadoPedido(id, nuevoEstado) {
       try {
         const res = await fetch(`${API_URL}/api/pedidos/${id}`, {
@@ -269,45 +313,68 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ estado: nuevoEstado })
         });
-        
-        if (res.ok) {
-          cargarReporteMensual(); // Recargamos para refrescar la tabla y las matemáticas del mes
-        }
+        if (res.ok) cargarReporteMensual();
       } catch (error) {
         console.error("Error al actualizar estado:", error);
       }
     }
 
-    // Inicializar la vista al cargar la página
-    document.addEventListener("DOMContentLoaded", () => {
-      // Ajustar automáticamente al mes actual del sistema
+    // 🚀 CONTROL ROLES: INICIALIZACIÓN DE LA VISTA
+    document.addEventListener("DOMContentLoaded", async () => {
       const mesActual = new Date().getMonth() + 1;
       document.getElementById('filtroMes').value = mesActual;
+
+      const nombreUsuario = localStorage.getItem('nombre') || 'Usuario';
+      
+      if (ROL_USUARIO === 'admin') {
+        document.getElementById('tituloReporte').innerText = "💼 Panel de Control Comercial";
+        document.getElementById('subtituloUsuario').innerText = `Administrador: ${nombreUsuario}`;
+        document.getElementById('contenedorFiltroVendedor').style.display = 'block';
+        
+        await cargarVendedoresParaAdmin();
+        vendedorSeleccionado = 'todos'; 
+      } else {
+        document.getElementById('tituloReporte').innerText = "📊 Reporte Comercial Mensual";
+        document.getElementById('subtituloUsuario').innerText = `Asesor: ${nombreUsuario}`;
+        vendedorSeleccionado = ID_USUARIO;
+      }
       
       cargarReporteMensual();
     });
 
-    // 🟢 PEGA ESTO EN SU LUGAR (FUNCIONES REALES DEL MODAL):
+    async function cargarVendedoresParaAdmin() {
+      try {
+        const res = await fetch(`${API_URL}/api/vendedores`); 
+        const vendedores = await res.json();
+        const selectVendedor = document.getElementById('filtroVendedor');
+        
+        vendedores.forEach(v => {
+          selectVendedor.innerHTML += `<option value="${v.id}">👤 ${v.nombre}</option>`;
+        });
+      } catch (error) {
+        console.error("❌ Error cargando vendedores:", error);
+      }
+    }
 
-function abrirModalPedido() {
-    // Cambiamos el display de 'none' a 'flex' para que se dibuje el modal en pantalla
-    document.getElementById('modalPedido').style.display = 'flex';
-    // Ponemos la fecha de hoy automáticamente en el calendario
-    document.getElementById('pedFecha').value = new Date().toISOString().split('T')[0];
-    
-    // Llamamos a la función que va a la base de datos por tus clientes
-    cargarClientesEnModal();
-}
+    function cambioVendedorAdmin() {
+      vendedorSeleccionado = document.getElementById('filtroVendedor').value;
+      cargarReporteMensual();
+    }
 
-function cerrarModalPedido() {
-    // Escondemos el formulario de nuevo
-    document.getElementById('modalPedido').style.display = 'none';
-    document.getElementById('formNuevoPedido').reset();
-}
+    // 🚪 CONTROL DEL MODAL
+    function abrirModalPedido() {
+      document.getElementById('modalPedido').style.display = 'flex';
+      document.getElementById('pedFecha').value = new Date().toISOString().split('T')[0];
+      cargarClientesEnModal();
+    }
 
-// 🏢 TRAER CLIENTES REALES AL DESPLEGABLE DEL MODAL
-async function cargarClientesEnModal() {
-    try {
+    function cerrarModalPedido() {
+      document.getElementById('modalPedido').style.display = 'none';
+      document.getElementById('formNuevoPedido').reset();
+    }
+
+    async function cargarClientesEnModal() {
+      try {
         let idFiltro = ROL_USUARIO === 'vendedor' ? ID_USUARIO : null;
         const urlBase = `${API_URL}/api/clientes`;
         const urlFinal = idFiltro ? `${urlBase}?vendedorId=${idFiltro}` : urlBase;
@@ -317,52 +384,47 @@ async function cargarClientesEnModal() {
         const selectCliente = document.getElementById('pedCliente');
 
         if (!selectCliente) return;
-
         if (!clientes.length) {
-            selectCliente.innerHTML = '<option value="">No tienes clientes asignados</option>';
-            return;
+          selectCliente.innerHTML = '<option value="">No tienes clientes asignados</option>';
+          return;
         }
 
-        // Llenamos el select con los nombres de tus empresas asignadas
         selectCliente.innerHTML = '<option value="">-- Seleccione un cliente --</option>' + 
-            clientes.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
-    } catch (error) {
-        console.error("❌ Error cargando clientes en el modal:", error);
+          clientes.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
+      } catch (error) {
+        console.error("❌ Error cargando clientes:", error);
+      }
     }
-}
 
-// 💾 PROCESAR Y GUARDAR EL PEDIDO EN LA BASE DE DATOS
-async function guardarPedido(event) {
-    event.preventDefault(); // Evita que la página se recargue sola y dañe el flujo
-
-    const nuevoPedido = {
+    async function guardarPedido(event) {
+      event.preventDefault();
+      const nuevoPedido = {
         fecha: document.getElementById('pedFecha').value,
         numero_pedido: document.getElementById('pedNumero').value,
         cliente_nombre: document.getElementById('pedCliente').value,
         valor: document.getElementById('pedValor').value,
         estado: document.getElementById('pedEstado').value,
         vendedor_id: ID_USUARIO
-    };
+      };
 
-    try {
+      try {
         const response = await fetch(`${API_URL}/api/pedidos`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(nuevoPedido)
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(nuevoPedido)
         });
 
         if (response.ok) {
-            cerrarModalPedido(); // Cerramos el modal si todo sale bien
-            cargarReporteMensual(); // 📊 Recargamos la tabla y KPIs al instante
+          cerrarModalPedido();
+          cargarReporteMensual();
         } else {
-            const errData = await response.json();
-            alert("Error al guardar en el servidor: " + errData.error);
+          const errData = await response.json();
+          alert("Error al guardar: " + errData.error);
         }
-    } catch (error) {
-        console.error("❌ Error conectando a la API de pedidos:", error);
-        alert("Error de conexión con el servidor de Render.");
+      } catch (error) {
+        console.error("❌ Error guardando pedido:", error);
+      }
     }
-}
   </script>
 </body>
 </html>
