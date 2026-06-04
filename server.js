@@ -28,6 +28,11 @@ app.get('/clientes', (req, res) => {
     res.sendFile(path.join(__dirname, 'paginas', 'clientes.html'));
 })
 
+// Ruta para la pantalla de Reporte
+app.get('/reporte', (req, res) => {
+    res.sendFile(path.join(__dirname, 'paginas', 'reporte.html'));
+});
+
 // --- 🛠️ CONFIGURACIÓN DE LA BASE DE DATOS CON POOL INTELIGENTE ---
 // Usamos 'createPool' para que la conexión no se muera por inactividad por las mañanas
 const db = mysql.createPool({
