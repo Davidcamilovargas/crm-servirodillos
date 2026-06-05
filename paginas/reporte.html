@@ -82,7 +82,6 @@
     font-size: 26px; font-weight: 900; line-height: 1; color: var(--ink-1);
   }
 
-  /* ✅ BARRA DE PROGRESO META */
   .meta-card { grid-column: 1 / -1; text-align: left !important; }
   .meta-card h3 { margin-bottom: 12px !important; }
   .meta-info {
@@ -124,6 +123,23 @@
   .row-pendiente { border-left: 3px solid var(--brand-orange); }
   .row-entregado { border-left: 3px solid var(--brand-green); background: rgba(141,198,63,.03); }
 
+  /* COLUMNAS ORDENABLES */
+  th.sortable {
+    cursor: pointer; user-select: none;
+    white-space: nowrap;
+    transition: background .15s, color .15s;
+  }
+  th.sortable:hover { background: var(--surface-2); color: var(--brand-orange); }
+  th.sortable .sort-icon {
+    display: inline-block; margin-left: 5px;
+    font-size: 10px; opacity: .35;
+    transition: opacity .15s, transform .2s;
+  }
+  th.sortable.asc  .sort-icon,
+  th.sortable.desc .sort-icon { opacity: 1; color: var(--brand-orange); }
+  th.sortable.asc  .sort-icon { content: '▲'; }
+  th.sortable.desc .sort-icon { transform: rotate(180deg); }
+
   .badge-pendiente {
     display: inline-flex; align-items: center;
     font-size: 11px; font-weight: 700; padding: 3px 11px;
@@ -150,8 +166,37 @@
   .btn-agregar:hover { background: var(--brand-orange-h) !important; }
   .pedido-num { font-weight: 700; color: var(--brand-orange); }
 
-  /* MODAL */
-  #modalPedido {
+  /* ACCIONES DE FILA */
+  .acciones-fila {
+    display: flex; gap: 6px; align-items: center; flex-wrap: wrap;
+  }
+  .btn-entregar {
+    background: var(--brand-green-l); color: var(--brand-green-d);
+    border: 1px solid rgba(141,198,63,.3);
+    font-size: 11px; font-weight: 700; padding: 4px 10px;
+    border-radius: var(--radius-sm); cursor: pointer;
+    transition: background .15s; white-space: nowrap;
+  }
+  .btn-entregar:hover { background: rgba(141,198,63,.25); }
+  .btn-editar {
+    background: rgba(49,130,206,.1); color: #3182ce;
+    border: 1px solid rgba(49,130,206,.25);
+    font-size: 11px; font-weight: 700; padding: 4px 10px;
+    border-radius: var(--radius-sm); cursor: pointer;
+    transition: background .15s; white-space: nowrap;
+  }
+  .btn-editar:hover { background: rgba(49,130,206,.2); }
+  .btn-eliminar {
+    background: rgba(229,62,62,.08); color: #c0392b;
+    border: 1px solid rgba(229,62,62,.2);
+    font-size: 11px; font-weight: 700; padding: 4px 10px;
+    border-radius: var(--radius-sm); cursor: pointer;
+    transition: background .15s; white-space: nowrap;
+  }
+  .btn-eliminar:hover { background: rgba(229,62,62,.18); }
+
+  /* MODAL COMPARTIDO */
+  .modal-overlay {
     display: none; position: fixed; z-index: 1000; inset: 0;
     background: rgba(20,20,20,.5); backdrop-filter: blur(4px);
     justify-content: center; align-items: center; padding: 16px;
@@ -195,6 +240,25 @@
   }
   .btn-save:hover { background: var(--brand-orange-h); }
 
+  /* MODAL ELIMINAR */
+  .modal-eliminar-body {
+    text-align: center; padding: 10px 0 6px;
+  }
+  .modal-eliminar-body .icono-warning {
+    font-size: 40px; margin-bottom: 12px; display: block;
+  }
+  .modal-eliminar-body p {
+    font-size: 14px; color: var(--ink-2); line-height: 1.5; margin: 0;
+  }
+  .modal-eliminar-body strong { color: var(--ink-1); }
+  .btn-delete {
+    background: #c0392b; color: #fff; padding: 10px 20px;
+    border-radius: var(--radius-sm); border: none; cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .8px; transition: background .15s;
+  }
+  .btn-delete:hover { background: #a93226; }
+
   @media (max-width: 720px) {
     .main-content { margin-left: 0; padding: 16px; padding-top: 60px; }
     .reporte-header { flex-direction: column; }
@@ -203,8 +267,10 @@
     .kpi-container { grid-template-columns: 1fr 1fr; gap: 10px; }
     .kpi-value { font-size: 20px; }
     .modal-actions { flex-direction: column; }
-    .btn-cancel, .btn-save { width: 100%; text-align: center; }
+    .btn-cancel, .btn-save, .btn-delete { width: 100%; text-align: center; }
     .meta-card { grid-column: auto; }
+    .acciones-fila { gap: 4px; }
+    .btn-entregar, .btn-editar, .btn-eliminar { font-size: 10px; padding: 3px 7px; }
   }
   @media (max-width: 420px) { .kpi-container { grid-template-columns: 1fr; } }
   </style>
@@ -280,7 +346,7 @@
     <button class="btn-action btn-agregar" onclick="abrirModalPedido()">＋ Agregar Pedido</button>
   </div>
 
-  <!-- KPIs + BARRA DE META -->
+  <!-- KPIs -->
   <div class="kpi-container">
     <div class="kpi-card">
       <h3>Total Ventas</h3>
@@ -294,8 +360,6 @@
       <h3>Restante</h3>
       <div class="kpi-value" id="kpiRestante" style="color:#C0392B;">—</div>
     </div>
-
-    <!-- ✅ BARRA DE PROGRESO -->
     <div class="kpi-card meta-card">
       <h3>📈 Progreso hacia la meta</h3>
       <div class="meta-info">
@@ -320,8 +384,12 @@
     <table>
       <thead>
         <tr>
-          <th>Fecha</th><th>Pedido #</th><th>Cliente / Empresa</th>
-          <th>Estado</th><th>Valor</th><th>Acciones</th>
+          <th class="sortable" data-col="fecha"          onclick="ordenarTabla('fecha')">         Fecha           <span class="sort-icon">▲</span></th>
+          <th class="sortable" data-col="numero_pedido"  onclick="ordenarTabla('numero_pedido')"> Pedido #         <span class="sort-icon">▲</span></th>
+          <th class="sortable" data-col="cliente_nombre" onclick="ordenarTabla('cliente_nombre')">Cliente / Empresa<span class="sort-icon">▲</span></th>
+          <th class="sortable" data-col="estado"         onclick="ordenarTabla('estado')">         Estado           <span class="sort-icon">▲</span></th>
+          <th class="sortable" data-col="valor"          onclick="ordenarTabla('valor')">           Valor            <span class="sort-icon">▲</span></th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody id="tablaPedidos"></tbody>
@@ -330,33 +398,51 @@
 
 </div>
 
-<!-- MODAL -->
-<div id="modalPedido">
+<!-- MODAL AGREGAR / EDITAR -->
+<div id="modalPedido" class="modal-overlay">
   <div class="modal-box">
     <div class="modal-header">
-      <h3>📦 Registrar Nuevo Pedido</h3>
+      <h3 id="modalPedidoTitulo">📦 Registrar Nuevo Pedido</h3>
       <span class="modal-close" onclick="cerrarModalPedido()">&times;</span>
     </div>
-    <form id="formNuevoPedido" onsubmit="guardarPedido(event)">
-      <div class="modal-field"><label>📅 Fecha</label><input type="date" id="pedFecha" required></div>
-      <div class="modal-field"><label>🔢 Número de Pedido</label><input type="text" id="pedNumero" placeholder="Ej: 6035" required></div>
-      <div class="modal-field">
-        <label>🏢 Cliente / Empresa</label>
-        <select id="pedCliente" required><option value="">Cargando clientes...</option></select>
-      </div>
-      <div class="modal-field"><label>💵 Valor del Pedido ($)</label><input type="number" id="pedValor" placeholder="Ej: 1050000" required></div>
-      <div class="modal-field">
-        <label>📌 Estado Inicial</label>
-        <select id="pedEstado">
-          <option value="Pendiente">⏳ Pendiente</option>
-          <option value="Entregado">📦 Entregado</option>
-        </select>
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="btn-cancel" onclick="cerrarModalPedido()">Cancelar</button>
-        <button type="submit" class="btn-save">💾 Guardar Pedido</button>
-      </div>
-    </form>
+    <!-- id oculto para edición -->
+    <input type="hidden" id="pedId">
+    <div class="modal-field"><label>📅 Fecha</label><input type="date" id="pedFecha" required></div>
+    <div class="modal-field"><label>🔢 Número de Pedido</label><input type="text" id="pedNumero" placeholder="Ej: 6035" required></div>
+    <div class="modal-field">
+      <label>🏢 Cliente / Empresa</label>
+      <select id="pedCliente" required><option value="">Cargando clientes...</option></select>
+    </div>
+    <div class="modal-field"><label>💵 Valor del Pedido ($)</label><input type="number" id="pedValor" placeholder="Ej: 1050000" required></div>
+    <div class="modal-field">
+      <label>📌 Estado</label>
+      <select id="pedEstado">
+        <option value="Pendiente">⏳ Pendiente</option>
+        <option value="Entregado">📦 Entregado</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn-cancel" onclick="cerrarModalPedido()">Cancelar</button>
+      <button type="button" class="btn-save" onclick="guardarPedido()">💾 Guardar Pedido</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAR ELIMINAR -->
+<div id="modalEliminar" class="modal-overlay">
+  <div class="modal-box" style="max-width:380px;">
+    <div class="modal-header">
+      <h3>⚠️ Eliminar Pedido</h3>
+      <span class="modal-close" onclick="cerrarModalEliminar()">&times;</span>
+    </div>
+    <div class="modal-eliminar-body">
+      <span class="icono-warning">🗑️</span>
+      <p>¿Estás seguro de que quieres eliminar el pedido <strong id="eliminarNombrePedido"></strong>?<br>Esta acción no se puede deshacer.</p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cerrarModalEliminar()">Cancelar</button>
+      <button class="btn-delete" onclick="confirmarEliminar()">🗑️ Sí, Eliminar</button>
+    </div>
   </div>
 </div>
 
@@ -369,82 +455,124 @@
   const ROL_USUARIO    = usuarioSesion.rol;
   const ID_USUARIO     = usuarioSesion.id;
   const NOMBRE_USUARIO = usuarioSesion.nombre;
-  // ✅ Meta viene del login; si no está guardada aún, usamos un fallback por ID
-  const METAS_LOCAL = { 1: 80000000, 2: 30000000 };
-  const META_USUARIO = usuarioSesion.meta || METAS_LOCAL[ID_USUARIO] || 15000000;
+  const METAS_LOCAL    = { 1: 80000000, 2: 30000000 };
+  const META_USUARIO   = usuarioSesion.meta || METAS_LOCAL[ID_USUARIO] || 15000000;
 
   let vendedorSeleccionado = ID_USUARIO;
-  let metaActual = META_USUARIO;
+  let metaActual           = META_USUARIO;
+  let pedidoAEliminarId    = null;
+
+  // Estado de ordenamiento
+  let sortCol = 'fecha';
+  let sortDir = 'desc'; // más reciente primero por defecto
+  let pedidosCache = []; // guarda los pedidos para reordenar sin llamar al API
 
   const fmt = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 });
 
-  // ✅ Dibuja la barra de progreso
+  /* ── ORDENAR TABLA ── */
+  function ordenarTabla(col) {
+    if (sortCol === col) {
+      sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+      sortCol = col;
+      sortDir = 'asc';
+    }
+    // Actualizar clases en encabezados
+    document.querySelectorAll('th.sortable').forEach(th => {
+      th.classList.remove('asc', 'desc');
+      if (th.dataset.col === col) th.classList.add(sortDir);
+    });
+    renderTabla(pedidosCache);
+  }
+
+  function renderTabla(pedidos) {
+    // Clonar y ordenar
+    const lista = [...pedidos].sort((a, b) => {
+      let va = a[sortCol], vb = b[sortCol];
+      // Comparación numérica para valor
+      if (sortCol === 'valor') { va = Number(va); vb = Number(vb); }
+      // Comparación de fecha
+      else if (sortCol === 'fecha') { va = new Date(va); vb = new Date(vb); }
+      // Comparación de string genérico
+      else { va = String(va).toLowerCase(); vb = String(vb).toLowerCase(); }
+      if (va < vb) return sortDir === 'asc' ? -1 : 1;
+      if (va > vb) return sortDir === 'asc' ?  1 : -1;
+      return 0;
+    });
+
+    const tbody = document.getElementById('tablaPedidos');
+    tbody.innerHTML = '';
+    if (!lista.length) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:36px;color:var(--ink-3);font-style:italic;">No hay pedidos registrados en este mes.</td></tr>`;
+      return;
+    }
+    lista.forEach(p => {
+      const claseFila   = p.estado === 'Pendiente' ? 'row-pendiente' : 'row-entregado';
+      const claseBadge  = p.estado === 'Pendiente' ? 'badge-pendiente' : 'badge-entregado';
+      const nuevoEstado = p.estado === 'Pendiente' ? 'Entregado' : 'Pendiente';
+      const textoBtn    = p.estado === 'Pendiente' ? '✔ Entregar' : '↩ Revertir';
+      const fecha       = new Date(p.fecha).toLocaleDateString('es-CO', { timeZone: 'UTC' });
+      const pedidoData  = encodeURIComponent(JSON.stringify(p));
+      tbody.innerHTML += `
+        <tr class="${claseFila}">
+          <td style="font-size:12px;color:var(--ink-3)">${fecha}</td>
+          <td class="pedido-num">${p.numero_pedido}</td>
+          <td><strong>${p.cliente_nombre}</strong></td>
+          <td><span class="${claseBadge}">${p.estado}</span></td>
+          <td style="font-weight:600;">${fmt.format(p.valor)}</td>
+          <td>
+            <div class="acciones-fila">
+              <button class="btn-entregar" onclick="cambiarEstadoPedido(${p.id},'${nuevoEstado}')">${textoBtn}</button>
+              <button class="btn-editar"   onclick="abrirModalEditar('${pedidoData}')">✏️ Editar</button>
+              <button class="btn-eliminar" onclick="abrirModalEliminar(${p.id},'${p.numero_pedido}')">🗑️ Eliminar</button>
+            </div>
+          </td>
+        </tr>`;
+    });
+  }
+
+  /* ── BARRA DE PROGRESO ── */
   function actualizarBarra(totalVenta, meta) {
     const pct      = Math.min((totalVenta / meta) * 100, 100);
     const restante = meta - totalVenta;
-
-    document.getElementById('metaBarraTotal').textContent    = fmt.format(totalVenta);
-    document.getElementById('metaBarraMeta').textContent     = fmt.format(meta);
-    document.getElementById('metaBarraPct').textContent      = pct.toFixed(1) + '%';
-    document.getElementById('metaBarraPct').style.color      = pct >= 100 ? 'var(--brand-green-d)' : 'var(--brand-orange)';
-
+    document.getElementById('metaBarraTotal').textContent   = fmt.format(totalVenta);
+    document.getElementById('metaBarraMeta').textContent    = fmt.format(meta);
+    document.getElementById('metaBarraPct').textContent     = pct.toFixed(1) + '%';
+    document.getElementById('metaBarraPct').style.color     = pct >= 100 ? 'var(--brand-green-d)' : 'var(--brand-orange)';
     const bar = document.getElementById('progressBar');
     bar.style.width = pct + '%';
     bar.className   = 'progress-bar' + (pct >= 100 ? ' completa' : '');
-
     document.getElementById('metaBarraRestante').textContent =
       restante > 0 ? `Faltan ${fmt.format(restante)}` : '¡Meta superada! 🎉';
     document.getElementById('metaBarraEstado').textContent   =
       pct >= 100 ? '✅ Completada' : `${pct.toFixed(1)}% alcanzado`;
   }
 
+  /* ── CARGAR REPORTE ── */
   async function cargarReporteMensual() {
     const mes  = document.getElementById('filtroMes').value;
     const anio = document.getElementById('filtroAnio').value;
     let url    = `${API_URL}/api/pedidos?mes=${mes}&anio=${anio}`;
-
     if (vendedorSeleccionado !== 'todos') url += `&vendedorId=${vendedorSeleccionado}`;
 
     try {
       const res  = await fetch(url);
       const data = await res.json();
 
-      // KPIs
       document.getElementById('kpiTotal').innerText    = fmt.format(data.kpis.totalVenta);
       document.getElementById('kpiMeta').innerText     = fmt.format(data.kpis.meta);
       const restEl = document.getElementById('kpiRestante');
       restEl.innerText   = fmt.format(data.kpis.restante);
       restEl.style.color = data.kpis.restante <= 0 ? 'var(--brand-green-d)' : '#C0392B';
-
-      // Barra de progreso
       actualizarBarra(data.kpis.totalVenta, data.kpis.meta);
 
-      // Tabla
-      const tbody = document.getElementById('tablaPedidos');
-      tbody.innerHTML = '';
-      if (!data.pedidos.length) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:36px;color:var(--ink-3);font-style:italic;">No hay pedidos registrados en este mes.</td></tr>`;
-        return;
-      }
-      data.pedidos.forEach(p => {
-        const claseFila   = p.estado === 'Pendiente' ? 'row-pendiente' : 'row-entregado';
-        const claseBadge  = p.estado === 'Pendiente' ? 'badge-pendiente' : 'badge-entregado';
-        const nuevoEstado = p.estado === 'Pendiente' ? 'Entregado' : 'Pendiente';
-        const textoBoton  = p.estado === 'Pendiente' ? '✔ Entregar' : '↩ Revertir';
-        const fecha       = new Date(p.fecha).toLocaleDateString('es-CO', { timeZone: 'UTC' });
-        tbody.innerHTML += `
-          <tr class="${claseFila}">
-            <td style="font-size:12px;color:var(--ink-3)">${fecha}</td>
-            <td class="pedido-num">${p.numero_pedido}</td>
-            <td><strong>${p.cliente_nombre}</strong></td>
-            <td><span class="${claseBadge}">${p.estado}</span></td>
-            <td style="font-weight:600;">${fmt.format(p.valor)}</td>
-            <td><button class="btn-action" onclick="cambiarEstadoPedido(${p.id},'${nuevoEstado}')">${textoBoton}</button></td>
-          </tr>`;
-      });
+      // Guardar en caché y renderizar con el orden actual
+      pedidosCache = data.pedidos;
+      renderTabla(pedidosCache);
     } catch (e) { console.error("❌ Error cargando reporte:", e); }
   }
 
+  /* ── CAMBIAR ESTADO ── */
   async function cambiarEstadoPedido(id, nuevoEstado) {
     try {
       const res = await fetch(`${API_URL}/api/pedidos/${id}`, {
@@ -455,10 +583,127 @@
     } catch (e) { console.error("Error al actualizar:", e); }
   }
 
+  /* ── MODAL AGREGAR ── */
+  function abrirModalPedido() {
+    document.getElementById('pedId').value     = '';
+    document.getElementById('pedFecha').value  = new Date().toISOString().split('T')[0];
+    document.getElementById('pedNumero').value = '';
+    document.getElementById('pedValor').value  = '';
+    document.getElementById('pedEstado').value = 'Pendiente';
+    document.getElementById('modalPedidoTitulo').textContent = '📦 Registrar Nuevo Pedido';
+    document.getElementById('modalPedido').style.display = 'flex';
+    cargarClientesEnModal();
+  }
+
+  /* ── MODAL EDITAR ── */
+  async function abrirModalEditar(pedidoEncoded) {
+    const p = JSON.parse(decodeURIComponent(pedidoEncoded));
+    document.getElementById('pedId').value     = p.id;
+    document.getElementById('pedFecha').value  = p.fecha ? p.fecha.split('T')[0] : '';
+    document.getElementById('pedNumero').value = p.numero_pedido;
+    document.getElementById('pedValor').value  = p.valor;
+    document.getElementById('pedEstado').value = p.estado;
+    document.getElementById('modalPedidoTitulo').textContent = '✏️ Editar Pedido';
+    document.getElementById('modalPedido').style.display = 'flex';
+    await cargarClientesEnModal(p.cliente_nombre);
+  }
+
+  function cerrarModalPedido() {
+    document.getElementById('modalPedido').style.display = 'none';
+  }
+
+  /* ── GUARDAR (crear o editar) ── */
+  async function guardarPedido() {
+    const id    = document.getElementById('pedId').value;
+    const datos = {
+      fecha:          document.getElementById('pedFecha').value,
+      numero_pedido:  document.getElementById('pedNumero').value,
+      cliente_nombre: document.getElementById('pedCliente').value,
+      valor:          document.getElementById('pedValor').value,
+      estado:         document.getElementById('pedEstado').value,
+      vendedor_id:    ID_USUARIO
+    };
+
+    // Validación básica
+    if (!datos.fecha || !datos.numero_pedido || !datos.cliente_nombre || !datos.valor) {
+      alert('Por favor completa todos los campos.');
+      return;
+    }
+
+    try {
+      let response;
+      if (id) {
+        // EDITAR — PUT
+        response = await fetch(`${API_URL}/api/pedidos/${id}`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datos)
+        });
+      } else {
+        // CREAR — POST
+        response = await fetch(`${API_URL}/api/pedidos`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datos)
+        });
+      }
+
+      if (response.ok) {
+        cerrarModalPedido();
+        cargarReporteMensual();
+      } else {
+        const err = await response.json();
+        alert("Error al guardar: " + (err.error || 'Error desconocido'));
+      }
+    } catch (e) { console.error("❌ Error guardando pedido:", e); }
+  }
+
+  /* ── MODAL ELIMINAR ── */
+  function abrirModalEliminar(id, numeroPedido) {
+    pedidoAEliminarId = id;
+    document.getElementById('eliminarNombrePedido').textContent = `#${numeroPedido}`;
+    document.getElementById('modalEliminar').style.display = 'flex';
+  }
+
+  function cerrarModalEliminar() {
+    pedidoAEliminarId = null;
+    document.getElementById('modalEliminar').style.display = 'none';
+  }
+
+  async function confirmarEliminar() {
+    if (!pedidoAEliminarId) return;
+    try {
+      const res = await fetch(`${API_URL}/api/pedidos/${pedidoAEliminarId}`, { method: 'DELETE' });
+      if (res.ok) {
+        cerrarModalEliminar();
+        cargarReporteMensual();
+      } else {
+        const err = await res.json();
+        alert("Error al eliminar: " + (err.error || 'Error desconocido'));
+      }
+    } catch (e) { console.error("❌ Error eliminando pedido:", e); }
+  }
+
+  /* ── CLIENTES EN MODAL ── */
+  async function cargarClientesEnModal(clienteSeleccionado = null) {
+    try {
+      let idFiltro   = ROL_USUARIO === 'vendedor' ? ID_USUARIO : null;
+      const urlFinal = idFiltro ? `${API_URL}/api/clientes?vendedorId=${idFiltro}` : `${API_URL}/api/clientes`;
+      const response = await fetch(urlFinal);
+      const clientes = await response.json();
+      const sel      = document.getElementById('pedCliente');
+      if (!sel) return;
+      if (!clientes.length) { sel.innerHTML = '<option value="">No tienes clientes asignados</option>'; return; }
+      sel.innerHTML = '<option value="">-- Seleccione un cliente --</option>' +
+        clientes.map(c => `<option value="${c.nombre}" ${clienteSeleccionado === c.nombre ? 'selected' : ''}>${c.nombre}</option>`).join('');
+    } catch (e) { console.error("❌ Error cargando clientes:", e); }
+  }
+
+  /* ── INIT ── */
   document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById('filtroMes').value = new Date().getMonth() + 1;
+    // Marcar columna por defecto
+    const thFecha = document.querySelector('th[data-col="fecha"]');
+    if (thFecha) thFecha.classList.add('desc');
 
-    // Sidebar
     if (document.getElementById('lblNombreUsuario'))
       document.getElementById('lblNombreUsuario').textContent = NOMBRE_USUARIO;
     if (document.getElementById('lblRolUsuario'))
@@ -486,16 +731,15 @@
       const res        = await fetch(`${API_URL}/api/vendedores`);
       const vendedores = await res.json();
       const sel        = document.getElementById('filtroVendedor');
-      const METAS_LOCAL = { 1: 80000000, 2: 30000000 };
-
+      const ML         = { 1: 80000000, 2: 30000000 };
       sel.innerHTML = `
         <option value="${ID_USUARIO}">⭐ Mis Pedidos (${NOMBRE_USUARIO})</option>
         <option value="todos">🌍 Todos los Vendedores</option>
       `;
       vendedores.forEach(v => {
         if (String(v.id) !== String(ID_USUARIO)) {
-          const metaVendedor = METAS_LOCAL[v.id] ? ` — Meta: ${fmt.format(METAS_LOCAL[v.id])}` : '';
-          sel.innerHTML += `<option value="${v.id}">👤 ${v.nombre}${metaVendedor}</option>`;
+          const metaV = ML[v.id] ? ` — Meta: ${fmt.format(ML[v.id])}` : '';
+          sel.innerHTML += `<option value="${v.id}">👤 ${v.nombre}${metaV}</option>`;
         }
       });
     } catch (e) { console.error("❌ Error cargando vendedores:", e); }
@@ -506,55 +750,12 @@
     cargarReporteMensual();
   }
 
-  function abrirModalPedido() {
-    document.getElementById('modalPedido').style.display = 'flex';
-    document.getElementById('pedFecha').value = new Date().toISOString().split('T')[0];
-    cargarClientesEnModal();
-  }
-  function cerrarModalPedido() {
-    document.getElementById('modalPedido').style.display = 'none';
-    document.getElementById('formNuevoPedido').reset();
-  }
-
-  async function cargarClientesEnModal() {
-    try {
-      let idFiltro   = ROL_USUARIO === 'vendedor' ? ID_USUARIO : null;
-      const urlFinal = idFiltro ? `${API_URL}/api/clientes?vendedorId=${idFiltro}` : `${API_URL}/api/clientes`;
-      const response = await fetch(urlFinal);
-      const clientes = await response.json();
-      const sel      = document.getElementById('pedCliente');
-      if (!sel) return;
-      if (!clientes.length) { sel.innerHTML = '<option value="">No tienes clientes asignados</option>'; return; }
-      sel.innerHTML = '<option value="">-- Seleccione un cliente --</option>' +
-        clientes.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
-    } catch (e) { console.error("❌ Error cargando clientes:", e); }
-  }
-
-  async function guardarPedido(event) {
-    event.preventDefault();
-    const nuevoPedido = {
-      fecha:          document.getElementById('pedFecha').value,
-      numero_pedido:  document.getElementById('pedNumero').value,
-      cliente_nombre: document.getElementById('pedCliente').value,
-      valor:          document.getElementById('pedValor').value,
-      estado:         document.getElementById('pedEstado').value,
-      vendedor_id:    ID_USUARIO
-    };
-    try {
-      const response = await fetch(`${API_URL}/api/pedidos`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(nuevoPedido)
-      });
-      if (response.ok) { cerrarModalPedido(); cargarReporteMensual(); }
-      else { const err = await response.json(); alert("Error al guardar: " + err.error); }
-    } catch (e) { console.error("❌ Error guardando pedido:", e); }
-  }
-
   function cerrarSesion() {
     localStorage.removeItem('usuarioCRM');
     window.location.href = "/login";
   }
 
+  /* ── SIDEBAR MÓVIL ── */
   const sidebar   = document.getElementById('sidebar');
   const hamburger = document.getElementById('hamburger');
   const overlay   = document.getElementById('overlay');
