@@ -8,258 +8,190 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
-
   <style>
   :root {
     --pendiente-color: #E8891A;
     --entregado-color: #8DC63F;
-    --text-muted: #888;
   }
 
   .main-content {
     margin-left: var(--sidebar-w);
-    flex: 1;
-    min-height: 100vh;
-    padding: 28px;
+    flex: 1; min-height: 100vh; padding: 28px;
   }
 
   .reporte-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: 14px;
-    margin-bottom: 22px;
+    display: flex; justify-content: space-between;
+    align-items: flex-start; flex-wrap: wrap;
+    gap: 14px; margin-bottom: 22px;
   }
   .reporte-header h2 {
     font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 900;
-    font-size: 26px;
-    text-transform: uppercase;
-    letter-spacing: .8px;
-    color: var(--ink-1);
-    margin: 0;
+    font-weight: 900; font-size: 26px;
+    text-transform: uppercase; letter-spacing: .8px;
+    color: var(--ink-1); margin: 0;
   }
-  .reporte-header p {
-    font-size: 13px;
-    color: var(--ink-3);
-    margin: 4px 0 0;
-    font-weight: 500;
-  }
+  .reporte-header p { font-size: 13px; color: var(--ink-3); margin: 4px 0 0; font-weight: 500; }
 
   #contenedorFiltroVendedor {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 10px 16px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    box-shadow: var(--shadow);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 10px 16px;
+    display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow);
   }
   #contenedorFiltroVendedor label {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--ink-3);
-    white-space: nowrap;
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--ink-3); white-space: nowrap;
   }
 
   .control-bar {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 14px 18px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-    box-shadow: var(--shadow);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 18px;
+    display: flex; align-items: center; gap: 16px;
+    flex-wrap: wrap; margin-bottom: 20px; box-shadow: var(--shadow);
   }
   .control-bar label {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: var(--ink-3);
-    margin-right: 6px;
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--ink-3); margin-right: 6px;
   }
   .control-bar > div { display: flex; align-items: center; }
 
+  /* KPI CARDS */
   .kpi-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 16px;
-    margin-bottom: 22px;
+    gap: 16px; margin-bottom: 22px;
   }
   .kpi-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px 18px 16px;
-    text-align: center;
-    box-shadow: var(--shadow);
-    position: relative;
-    overflow: hidden;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px 18px 16px;
+    text-align: center; box-shadow: var(--shadow);
+    position: relative; overflow: hidden;
     transition: box-shadow .2s, border-color .2s;
   }
   .kpi-card:hover { box-shadow: var(--shadow-md); border-color: var(--border-2); }
   .kpi-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: var(--brand-orange);
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 3px; background: var(--brand-orange);
     border-radius: var(--radius) var(--radius) 0 0;
   }
   .kpi-card h3 {
-    margin: 0 0 10px;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--ink-3);
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    margin: 0 0 10px; font-size: 11px; font-weight: 700;
+    color: var(--ink-3); text-transform: uppercase; letter-spacing: 1px;
   }
   .kpi-value {
     font-family: 'Barlow Condensed', sans-serif;
-    font-size: 26px;
-    font-weight: 900;
-    line-height: 1;
-    color: var(--ink-1);
+    font-size: 26px; font-weight: 900; line-height: 1; color: var(--ink-1);
   }
 
-  .panel-tabla {
-    background: var(--surface);
+  /* ✅ BARRA DE PROGRESO META */
+  .meta-card { grid-column: 1 / -1; text-align: left !important; }
+  .meta-card h3 { margin-bottom: 12px !important; }
+  .meta-info {
+    display: flex; justify-content: space-between;
+    align-items: baseline; margin-bottom: 8px; flex-wrap: wrap; gap: 6px;
+  }
+  .meta-total {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 22px; font-weight: 900; color: var(--ink-1);
+  }
+  .meta-label { font-size: 12px; color: var(--ink-3); }
+  .meta-pct {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px; font-weight: 900;
+  }
+  .progress-track {
+    width: 100%; height: 12px; background: var(--surface-3);
+    border-radius: 99px; overflow: hidden;
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    overflow: hidden;
-    margin-bottom: 22px;
+  }
+  .progress-bar {
+    height: 100%; border-radius: 99px;
+    background: linear-gradient(90deg, var(--brand-orange), var(--brand-green));
+    transition: width .6s ease;
+    min-width: 2px;
+  }
+  .progress-bar.completa { background: var(--brand-green); }
+  .meta-footer {
+    display: flex; justify-content: space-between;
+    margin-top: 8px; font-size: 12px; color: var(--ink-3);
   }
 
-  .row-pendiente { border-left: 3px solid var(--brand-orange); }
-  .row-entregado {
-    border-left: 3px solid var(--brand-green);
-    background: rgba(141,198,63,.03);
+  /* TABLA */
+  .panel-tabla {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow);
+    overflow: hidden; margin-bottom: 22px;
   }
+  .row-pendiente { border-left: 3px solid var(--brand-orange); }
+  .row-entregado { border-left: 3px solid var(--brand-green); background: rgba(141,198,63,.03); }
 
   .badge-pendiente {
     display: inline-flex; align-items: center;
-    font-size: 11px; font-weight: 700;
-    padding: 3px 11px; border-radius: 20px;
-    text-transform: uppercase; letter-spacing: .5px;
-    background: var(--brand-orange-l);
-    color: var(--brand-orange-h);
+    font-size: 11px; font-weight: 700; padding: 3px 11px;
+    border-radius: 20px; text-transform: uppercase; letter-spacing: .5px;
+    background: var(--brand-orange-l); color: var(--brand-orange-h);
   }
   .badge-entregado {
     display: inline-flex; align-items: center;
-    font-size: 11px; font-weight: 700;
-    padding: 3px 11px; border-radius: 20px;
-    text-transform: uppercase; letter-spacing: .5px;
-    background: var(--brand-green-l);
-    color: var(--brand-green-d);
+    font-size: 11px; font-weight: 700; padding: 3px 11px;
+    border-radius: 20px; text-transform: uppercase; letter-spacing: .5px;
+    background: var(--brand-green-l); color: var(--brand-green-d);
   }
 
   .btn-agregar {
     margin-left: auto;
-    background: var(--brand-orange) !important;
-    border: none !important;
+    background: var(--brand-orange) !important; border: none !important;
     color: #fff !important;
     font-family: 'Barlow Condensed', sans-serif !important;
-    font-size: 14px !important;
-    font-weight: 700 !important;
-    text-transform: uppercase;
-    letter-spacing: .8px;
-    padding: 9px 18px !important;
-    border-radius: var(--radius-sm) !important;
-    cursor: pointer;
-    transition: background .15s !important;
+    font-size: 14px !important; font-weight: 700 !important;
+    text-transform: uppercase; letter-spacing: .8px;
+    padding: 9px 18px !important; border-radius: var(--radius-sm) !important;
+    cursor: pointer; transition: background .15s !important;
   }
   .btn-agregar:hover { background: var(--brand-orange-h) !important; }
-
   .pedido-num { font-weight: 700; color: var(--brand-orange); }
 
+  /* MODAL */
   #modalPedido {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    inset: 0;
-    background: rgba(20,20,20,.5);
-    backdrop-filter: blur(4px);
-    justify-content: center;
-    align-items: center;
-    padding: 16px;
+    display: none; position: fixed; z-index: 1000; inset: 0;
+    background: rgba(20,20,20,.5); backdrop-filter: blur(4px);
+    justify-content: center; align-items: center; padding: 16px;
   }
   .modal-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 28px;
-    width: 100%;
-    max-width: 460px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 28px; width: 100%; max-width: 460px;
     box-shadow: 0 20px 60px rgba(0,0,0,.15);
   }
   .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 14px;
-    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border);
   }
   .modal-header h3 {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 900; font-size: 18px;
-    text-transform: uppercase; letter-spacing: .8px;
-    color: var(--ink-1); margin: 0;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 18px;
+    text-transform: uppercase; letter-spacing: .8px; color: var(--ink-1); margin: 0;
   }
-  .modal-close {
-    color: var(--ink-3); cursor: pointer;
-    font-size: 24px; line-height: 1;
-    transition: color .15s;
-  }
+  .modal-close { color: var(--ink-3); cursor: pointer; font-size: 24px; line-height: 1; transition: color .15s; }
   .modal-close:hover { color: var(--ink-1); }
-
   .modal-field { margin-bottom: 14px; }
   .modal-field label {
-    display: block;
-    font-size: 11px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 1px;
-    color: var(--ink-3); margin-bottom: 5px;
+    display: block; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px; color: var(--ink-3); margin-bottom: 5px;
   }
-  .modal-field input,
-  .modal-field select { width: 100%; }
-
+  .modal-field input, .modal-field select { width: 100%; }
   .modal-actions {
-    display: flex; gap: 10px;
-    justify-content: flex-end;
-    margin-top: 20px; padding-top: 16px;
-    border-top: 1px solid var(--border);
+    display: flex; gap: 10px; justify-content: flex-end;
+    margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);
   }
   .btn-cancel {
-    background: var(--surface-2);
-    border: 1px solid var(--border-2);
-    color: var(--ink-2);
-    padding: 10px 18px;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    font-family: 'Barlow', sans-serif;
-    font-size: 13px; font-weight: 600;
-    transition: background .15s;
+    background: var(--surface-2); border: 1px solid var(--border-2); color: var(--ink-2);
+    padding: 10px 18px; border-radius: var(--radius-sm); cursor: pointer;
+    font-family: 'Barlow', sans-serif; font-size: 13px; font-weight: 600; transition: background .15s;
   }
   .btn-cancel:hover { background: var(--border); }
   .btn-save {
-    background: var(--brand-orange);
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: var(--radius-sm);
-    border: none; cursor: pointer;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 15px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: .8px;
-    transition: background .15s;
+    background: var(--brand-orange); color: #fff; padding: 10px 20px;
+    border-radius: var(--radius-sm); border: none; cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .8px; transition: background .15s;
   }
   .btn-save:hover { background: var(--brand-orange-h); }
 
@@ -272,20 +204,16 @@
     .kpi-value { font-size: 20px; }
     .modal-actions { flex-direction: column; }
     .btn-cancel, .btn-save { width: 100%; text-align: center; }
+    .meta-card { grid-column: auto; }
   }
-  @media (max-width: 420px) {
-    .kpi-container { grid-template-columns: 1fr; }
-  }
+  @media (max-width: 420px) { .kpi-container { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
 
-<button class="hamburger" id="hamburger" aria-label="Menú">
-  <span></span><span></span><span></span>
-</button>
+<button class="hamburger" id="hamburger" aria-label="Menú"><span></span><span></span><span></span></button>
 <div class="overlay" id="overlay"></div>
 
-<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
     <div>
@@ -295,47 +223,28 @@
   </div>
   <nav class="sidebar-nav">
     <div class="nav-label">Principal</div>
-    <a class="nav-item" href="/">
-      <span class="nav-icon">⬛</span> Panel
-    </a>
-    <a class="nav-item" href="/clientes">
-      <span class="nav-icon">◎</span> Clientes
-    </a>
-    <a class="nav-item active" href="/reporte">
-      <span class="nav-icon">◈</span> Reporte Comercial
-    </a>
+    <a class="nav-item" href="/"><span class="nav-icon">⬛</span> Panel</a>
+    <a class="nav-item" href="/clientes"><span class="nav-icon">◎</span> Clientes</a>
+    <a class="nav-item active" href="/reporte"><span class="nav-icon">◈</span> Reporte Comercial</a>
     <div class="nav-label">Reportes</div>
-    <a class="nav-item" href="#">
-      <span class="nav-icon">▣</span> Análisis
-    </a>
-    <a class="nav-item" href="#">
-      <span class="nav-icon">◧</span> Exportar
-    </a>
+    <a class="nav-item" href="#"><span class="nav-icon">▣</span> Análisis</a>
+    <a class="nav-item" href="#"><span class="nav-icon">◧</span> Exportar</a>
     <div class="nav-label">Equipo</div>
-    <a class="nav-item" href="#">
-      <span class="nav-icon">◉</span> Vendedores
-    </a>
-    <a class="nav-item" href="#">
-      <span class="nav-icon">⊙</span> Configuración
-    </a>
+    <a class="nav-item" href="#"><span class="nav-icon">◉</span> Vendedores</a>
+    <a class="nav-item" href="#"><span class="nav-icon">⊙</span> Configuración</a>
   </nav>
-
   <div class="sidebar-user">
     <div class="user-avatar" id="avatarIniciales">👤</div>
     <div class="user-info">
       <div class="user-name" id="lblNombreUsuario">Cargando...</div>
-      <div class="user-role" id="lblRolUsuario" style="text-transform: capitalize;">...</div>
+      <div class="user-role" id="lblRolUsuario" style="text-transform:capitalize;">...</div>
     </div>
   </div>
-
   <div class="sidebar-footer">
-    <button onclick="cerrarSesion()" class="btn-logout">
-      ↪ <span>Cerrar Sesión</span>
-    </button>
+    <button onclick="cerrarSesion()" class="btn-logout">↪ <span>Cerrar Sesión</span></button>
   </div>
 </aside>
 
-<!-- MAIN CONTENT -->
 <div class="main-content">
 
   <div class="reporte-header">
@@ -345,8 +254,7 @@
     </div>
     <div id="contenedorFiltroVendedor" style="display:none;">
       <label>Ver Asesor:</label>
-      <select id="filtroVendedor" onchange="cambioVendedorAdmin()">
-      </select>
+      <select id="filtroVendedor" onchange="cambioVendedorAdmin()"></select>
     </div>
   </div>
 
@@ -354,18 +262,12 @@
     <div>
       <label>Mes:</label>
       <select id="filtroMes" onchange="cargarReporteMensual()">
-        <option value="1">Enero</option>
-        <option value="2">Febrero</option>
-        <option value="3">Marzo</option>
-        <option value="4">Abril</option>
-        <option value="5">Mayo</option>
-        <option value="6">Junio</option>
-        <option value="7">Julio</option>
-        <option value="8">Agosto</option>
-        <option value="9">Septiembre</option>
-        <option value="10">Octubre</option>
-        <option value="11">Noviembre</option>
-        <option value="12">Diciembre</option>
+        <option value="1">Enero</option><option value="2">Febrero</option>
+        <option value="3">Marzo</option><option value="4">Abril</option>
+        <option value="5">Mayo</option><option value="6">Junio</option>
+        <option value="7">Julio</option><option value="8">Agosto</option>
+        <option value="9">Septiembre</option><option value="10">Octubre</option>
+        <option value="11">Noviembre</option><option value="12">Diciembre</option>
       </select>
     </div>
     <div>
@@ -378,6 +280,7 @@
     <button class="btn-action btn-agregar" onclick="abrirModalPedido()">＋ Agregar Pedido</button>
   </div>
 
+  <!-- KPIs + BARRA DE META -->
   <div class="kpi-container">
     <div class="kpi-card">
       <h3>Total Ventas</h3>
@@ -385,24 +288,40 @@
     </div>
     <div class="kpi-card">
       <h3>Meta del Mes</h3>
-      <div class="kpi-value" id="kpiMeta" style="color:#3182ce;">$ 15.000.000</div>
+      <div class="kpi-value" id="kpiMeta" style="color:#3182ce;">—</div>
     </div>
     <div class="kpi-card">
       <h3>Restante</h3>
-      <div class="kpi-value" id="kpiRestante" style="color:#C0392B;">$ 0</div>
+      <div class="kpi-value" id="kpiRestante" style="color:#C0392B;">—</div>
+    </div>
+
+    <!-- ✅ BARRA DE PROGRESO -->
+    <div class="kpi-card meta-card">
+      <h3>📈 Progreso hacia la meta</h3>
+      <div class="meta-info">
+        <div>
+          <div class="meta-total" id="metaBarraTotal">$0</div>
+          <div class="meta-label">de <span id="metaBarraMeta">—</span></div>
+        </div>
+        <div class="meta-pct" id="metaBarraPct" style="color:var(--brand-orange)">0%</div>
+      </div>
+      <div class="progress-track">
+        <div class="progress-bar" id="progressBar" style="width:0%"></div>
+      </div>
+      <div class="meta-footer">
+        <span id="metaBarraRestante"></span>
+        <span id="metaBarraEstado"></span>
+      </div>
     </div>
   </div>
 
+  <!-- TABLA -->
   <div class="panel-tabla">
     <table>
       <thead>
         <tr>
-          <th>Fecha</th>
-          <th>Pedido #</th>
-          <th>Cliente / Empresa</th>
-          <th>Estado</th>
-          <th>Valor</th>
-          <th>Acciones</th>
+          <th>Fecha</th><th>Pedido #</th><th>Cliente / Empresa</th>
+          <th>Estado</th><th>Valor</th><th>Acciones</th>
         </tr>
       </thead>
       <tbody id="tablaPedidos"></tbody>
@@ -411,7 +330,7 @@
 
 </div>
 
-<!-- MODAL NUEVO PEDIDO -->
+<!-- MODAL -->
 <div id="modalPedido">
   <div class="modal-box">
     <div class="modal-header">
@@ -419,24 +338,13 @@
       <span class="modal-close" onclick="cerrarModalPedido()">&times;</span>
     </div>
     <form id="formNuevoPedido" onsubmit="guardarPedido(event)">
-      <div class="modal-field">
-        <label>📅 Fecha</label>
-        <input type="date" id="pedFecha" required>
-      </div>
-      <div class="modal-field">
-        <label>🔢 Número de Pedido</label>
-        <input type="text" id="pedNumero" placeholder="Ej: 6035" required>
-      </div>
+      <div class="modal-field"><label>📅 Fecha</label><input type="date" id="pedFecha" required></div>
+      <div class="modal-field"><label>🔢 Número de Pedido</label><input type="text" id="pedNumero" placeholder="Ej: 6035" required></div>
       <div class="modal-field">
         <label>🏢 Cliente / Empresa</label>
-        <select id="pedCliente" required>
-          <option value="">Cargando clientes...</option>
-        </select>
+        <select id="pedCliente" required><option value="">Cargando clientes...</option></select>
       </div>
-      <div class="modal-field">
-        <label>💵 Valor del Pedido ($)</label>
-        <input type="number" id="pedValor" placeholder="Ej: 1050000" required>
-      </div>
+      <div class="modal-field"><label>💵 Valor del Pedido ($)</label><input type="number" id="pedValor" placeholder="Ej: 1050000" required></div>
       <div class="modal-field">
         <label>📌 Estado Inicial</label>
         <select id="pedEstado">
@@ -455,134 +363,142 @@
 <script>
   const API_URL = "https://crm-servirodillos.onrender.com";
 
-  // ✅ FIX 1: Leer sesión desde el objeto completo 'usuarioCRM' (igual que index.html y clientes.html)
   const usuarioSesion = JSON.parse(localStorage.getItem('usuarioCRM'));
-
-  // 🔒 FIX 2: Validar sesión — redirigir si no existe
   if (!usuarioSesion) window.location.href = "/login";
 
-  const ROL_USUARIO    = usuarioSesion.rol;     // ← era localStorage.getItem('rol'), ahora lee del objeto
-  const ID_USUARIO     = usuarioSesion.id;      // ← era localStorage.getItem('vendedorId') || 2 (hardcodeado!)
+  const ROL_USUARIO    = usuarioSesion.rol;
+  const ID_USUARIO     = usuarioSesion.id;
   const NOMBRE_USUARIO = usuarioSesion.nombre;
+  // ✅ Meta viene del login; si no está guardada aún, usamos un fallback por ID
+  const METAS_LOCAL = { 1: 80000000, 2: 30000000 };
+  const META_USUARIO = usuarioSesion.meta || METAS_LOCAL[ID_USUARIO] || 15000000;
 
   let vendedorSeleccionado = ID_USUARIO;
+  let metaActual = META_USUARIO;
 
-  const formatoMoneda = new Intl.NumberFormat('es-CO', {
-    style: 'currency', currency: 'COP', minimumFractionDigits: 0
-  });
+  const fmt = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 });
+
+  // ✅ Dibuja la barra de progreso
+  function actualizarBarra(totalVenta, meta) {
+    const pct      = Math.min((totalVenta / meta) * 100, 100);
+    const restante = meta - totalVenta;
+
+    document.getElementById('metaBarraTotal').textContent    = fmt.format(totalVenta);
+    document.getElementById('metaBarraMeta').textContent     = fmt.format(meta);
+    document.getElementById('metaBarraPct').textContent      = pct.toFixed(1) + '%';
+    document.getElementById('metaBarraPct').style.color      = pct >= 100 ? 'var(--brand-green-d)' : 'var(--brand-orange)';
+
+    const bar = document.getElementById('progressBar');
+    bar.style.width = pct + '%';
+    bar.className   = 'progress-bar' + (pct >= 100 ? ' completa' : '');
+
+    document.getElementById('metaBarraRestante').textContent =
+      restante > 0 ? `Faltan ${fmt.format(restante)}` : '¡Meta superada! 🎉';
+    document.getElementById('metaBarraEstado').textContent   =
+      pct >= 100 ? '✅ Completada' : `${pct.toFixed(1)}% alcanzado`;
+  }
 
   async function cargarReporteMensual() {
     const mes  = document.getElementById('filtroMes').value;
     const anio = document.getElementById('filtroAnio').value;
     let url    = `${API_URL}/api/pedidos?mes=${mes}&anio=${anio}`;
 
-    if (vendedorSeleccionado !== 'todos') {
-      url += `&vendedorId=${vendedorSeleccionado}`;
-    }
+    if (vendedorSeleccionado !== 'todos') url += `&vendedorId=${vendedorSeleccionado}`;
 
     try {
       const res  = await fetch(url);
       const data = await res.json();
 
-      document.getElementById('kpiTotal').innerText = formatoMoneda.format(data.kpis.totalVenta);
-      document.getElementById('kpiMeta').innerText  = formatoMoneda.format(data.kpis.meta);
-
+      // KPIs
+      document.getElementById('kpiTotal').innerText    = fmt.format(data.kpis.totalVenta);
+      document.getElementById('kpiMeta').innerText     = fmt.format(data.kpis.meta);
       const restEl = document.getElementById('kpiRestante');
-      restEl.innerText   = formatoMoneda.format(data.kpis.restante);
+      restEl.innerText   = fmt.format(data.kpis.restante);
       restEl.style.color = data.kpis.restante <= 0 ? 'var(--brand-green-d)' : '#C0392B';
 
+      // Barra de progreso
+      actualizarBarra(data.kpis.totalVenta, data.kpis.meta);
+
+      // Tabla
       const tbody = document.getElementById('tablaPedidos');
       tbody.innerHTML = '';
-
       if (!data.pedidos.length) {
         tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:36px;color:var(--ink-3);font-style:italic;">No hay pedidos registrados en este mes.</td></tr>`;
         return;
       }
-
       data.pedidos.forEach(p => {
         const claseFila   = p.estado === 'Pendiente' ? 'row-pendiente' : 'row-entregado';
         const claseBadge  = p.estado === 'Pendiente' ? 'badge-pendiente' : 'badge-entregado';
         const nuevoEstado = p.estado === 'Pendiente' ? 'Entregado' : 'Pendiente';
         const textoBoton  = p.estado === 'Pendiente' ? '✔ Entregar' : '↩ Revertir';
         const fecha       = new Date(p.fecha).toLocaleDateString('es-CO', { timeZone: 'UTC' });
-
         tbody.innerHTML += `
           <tr class="${claseFila}">
             <td style="font-size:12px;color:var(--ink-3)">${fecha}</td>
             <td class="pedido-num">${p.numero_pedido}</td>
             <td><strong>${p.cliente_nombre}</strong></td>
             <td><span class="${claseBadge}">${p.estado}</span></td>
-            <td style="font-weight:600;">${formatoMoneda.format(p.valor)}</td>
-            <td><button class="btn-action" onclick="cambiarEstadoPedido(${p.id}, '${nuevoEstado}')">${textoBoton}</button></td>
+            <td style="font-weight:600;">${fmt.format(p.valor)}</td>
+            <td><button class="btn-action" onclick="cambiarEstadoPedido(${p.id},'${nuevoEstado}')">${textoBoton}</button></td>
           </tr>`;
       });
-    } catch (e) {
-      console.error("❌ Error cargando el reporte:", e);
-    }
+    } catch (e) { console.error("❌ Error cargando reporte:", e); }
   }
 
   async function cambiarEstadoPedido(id, nuevoEstado) {
     try {
       const res = await fetch(`${API_URL}/api/pedidos/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ estado: nuevoEstado })
       });
       if (res.ok) cargarReporteMensual();
-    } catch (e) {
-      console.error("Error al actualizar:", e);
-    }
+    } catch (e) { console.error("Error al actualizar:", e); }
   }
 
   document.addEventListener("DOMContentLoaded", async () => {
-    const mesActual = new Date().getMonth() + 1;
-    document.getElementById('filtroMes').value = mesActual;
+    document.getElementById('filtroMes').value = new Date().getMonth() + 1;
 
-    // ✅ FIX 3: El nombre viene de NOMBRE_USUARIO (del objeto de sesión), no de claves sueltas
-    const nombreUsuario = NOMBRE_USUARIO;
-
-    // Pintar sidebar
+    // Sidebar
     if (document.getElementById('lblNombreUsuario'))
-      document.getElementById('lblNombreUsuario').textContent = nombreUsuario;
+      document.getElementById('lblNombreUsuario').textContent = NOMBRE_USUARIO;
     if (document.getElementById('lblRolUsuario'))
       document.getElementById('lblRolUsuario').textContent = ROL_USUARIO === 'admin' ? 'Administrador' : 'Asesor Comercial';
     if (document.getElementById('avatarIniciales'))
-      document.getElementById('avatarIniciales').textContent = nombreUsuario.slice(0, 2).toUpperCase();
+      document.getElementById('avatarIniciales').textContent = NOMBRE_USUARIO.slice(0,2).toUpperCase();
 
     vendedorSeleccionado = ID_USUARIO;
 
     if (ROL_USUARIO === 'admin') {
       document.getElementById('tituloReporte').innerText    = "💼 Panel de Control Comercial";
-      document.getElementById('subtituloUsuario').innerText = `Administrador: ${nombreUsuario}`;
+      document.getElementById('subtituloUsuario').innerText = `Administrador: ${NOMBRE_USUARIO}`;
       document.getElementById('contenedorFiltroVendedor').style.display = 'flex';
-      await cargarVendedoresParaAdmin(nombreUsuario);
+      await cargarVendedoresParaAdmin();
     } else {
       document.getElementById('tituloReporte').innerText    = "📊 Reporte Comercial Mensual";
-      document.getElementById('subtituloUsuario').innerText = `Asesor: ${nombreUsuario}`;
+      document.getElementById('subtituloUsuario').innerText = `Asesor: ${NOMBRE_USUARIO} · Meta: ${fmt.format(META_USUARIO)}`;
     }
 
     cargarReporteMensual();
   });
 
-  async function cargarVendedoresParaAdmin(nombreAdmin) {
+  async function cargarVendedoresParaAdmin() {
     try {
       const res        = await fetch(`${API_URL}/api/vendedores`);
       const vendedores = await res.json();
       const sel        = document.getElementById('filtroVendedor');
+      const METAS_LOCAL = { 1: 80000000, 2: 30000000 };
 
       sel.innerHTML = `
-        <option value="${ID_USUARIO}">⭐ Mis Pedidos (${nombreAdmin})</option>
+        <option value="${ID_USUARIO}">⭐ Mis Pedidos (${NOMBRE_USUARIO})</option>
         <option value="todos">🌍 Todos los Vendedores</option>
       `;
-
       vendedores.forEach(v => {
         if (String(v.id) !== String(ID_USUARIO)) {
-          sel.innerHTML += `<option value="${v.id}">👤 ${v.nombre}</option>`;
+          const metaVendedor = METAS_LOCAL[v.id] ? ` — Meta: ${fmt.format(METAS_LOCAL[v.id])}` : '';
+          sel.innerHTML += `<option value="${v.id}">👤 ${v.nombre}${metaVendedor}</option>`;
         }
       });
-    } catch (e) {
-      console.error("❌ Error cargando vendedores:", e);
-    }
+    } catch (e) { console.error("❌ Error cargando vendedores:", e); }
   }
 
   function cambioVendedorAdmin() {
@@ -595,7 +511,6 @@
     document.getElementById('pedFecha').value = new Date().toISOString().split('T')[0];
     cargarClientesEnModal();
   }
-
   function cerrarModalPedido() {
     document.getElementById('modalPedido').style.display = 'none';
     document.getElementById('formNuevoPedido').reset();
@@ -604,52 +519,35 @@
   async function cargarClientesEnModal() {
     try {
       let idFiltro   = ROL_USUARIO === 'vendedor' ? ID_USUARIO : null;
-      const urlBase  = `${API_URL}/api/clientes`;
-      const urlFinal = idFiltro ? `${urlBase}?vendedorId=${idFiltro}` : urlBase;
+      const urlFinal = idFiltro ? `${API_URL}/api/clientes?vendedorId=${idFiltro}` : `${API_URL}/api/clientes`;
       const response = await fetch(urlFinal);
       const clientes = await response.json();
       const sel      = document.getElementById('pedCliente');
-
       if (!sel) return;
-      if (!clientes.length) {
-        sel.innerHTML = '<option value="">No tienes clientes asignados</option>';
-        return;
-      }
-
+      if (!clientes.length) { sel.innerHTML = '<option value="">No tienes clientes asignados</option>'; return; }
       sel.innerHTML = '<option value="">-- Seleccione un cliente --</option>' +
         clientes.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join('');
-    } catch (e) {
-      console.error("❌ Error cargando clientes:", e);
-    }
+    } catch (e) { console.error("❌ Error cargando clientes:", e); }
   }
 
   async function guardarPedido(event) {
     event.preventDefault();
-    const fechaInput = document.getElementById('pedFecha').value;
     const nuevoPedido = {
-      fecha:          fechaInput,
+      fecha:          document.getElementById('pedFecha').value,
       numero_pedido:  document.getElementById('pedNumero').value,
       cliente_nombre: document.getElementById('pedCliente').value,
       valor:          document.getElementById('pedValor').value,
       estado:         document.getElementById('pedEstado').value,
-      vendedor_id:    ID_USUARIO   // ← siempre usa el ID real de sesión
+      vendedor_id:    ID_USUARIO
     };
     try {
       const response = await fetch(`${API_URL}/api/pedidos`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(nuevoPedido)
       });
-      if (response.ok) {
-        cerrarModalPedido();
-        cargarReporteMensual();
-      } else {
-        const err = await response.json();
-        alert("Error al guardar: " + err.error);
-      }
-    } catch (e) {
-      console.error("❌ Error guardando pedido:", e);
-    }
+      if (response.ok) { cerrarModalPedido(); cargarReporteMensual(); }
+      else { const err = await response.json(); alert("Error al guardar: " + err.error); }
+    } catch (e) { console.error("❌ Error guardando pedido:", e); }
   }
 
   function cerrarSesion() {
@@ -657,28 +555,16 @@
     window.location.href = "/login";
   }
 
-  // Hamburger móvil
   const sidebar   = document.getElementById('sidebar');
   const hamburger = document.getElementById('hamburger');
   const overlay   = document.getElementById('overlay');
-
-  hamburger.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
-    overlay.classList.toggle('show');
-  });
-  overlay.addEventListener('click', () => {
-    sidebar.classList.remove('open');
-    overlay.classList.remove('show');
-  });
+  hamburger.addEventListener('click', () => { sidebar.classList.toggle('open'); overlay.classList.toggle('show'); });
+  overlay.addEventListener('click',   () => { sidebar.classList.remove('open'); overlay.classList.remove('show'); });
   document.querySelectorAll('.nav-item').forEach(el => {
     el.addEventListener('click', () => {
-      if (window.innerWidth <= 720) {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('show');
-      }
+      if (window.innerWidth <= 720) { sidebar.classList.remove('open'); overlay.classList.remove('show'); }
     });
   });
 </script>
-
 </body>
 </html>

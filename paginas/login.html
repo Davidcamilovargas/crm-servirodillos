@@ -6,13 +6,7 @@
     <title>Login - CRM Servirodillos</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        /* --- ESTILOS BASE CYBERPUNK / GLASSMORPHISM --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
         body {
             background: radial-gradient(circle at center, #1a1c24 0%, #0f1015 100%);
@@ -24,164 +18,88 @@
             position: relative;
         }
 
-        /* Efectos de luces de fondo (Neon Glows) */
         body::before, body::after {
             content: '';
             position: absolute;
-            width: 300px;
-            height: 300px;
+            width: 300px; height: 300px;
             border-radius: 50%;
             filter: blur(120px);
             opacity: 0.15;
             z-index: 0;
         }
-        body::before {
-            background: #8a2be2; /* Morado neón */
-            top: 20%;
-            left: 25%;
-        }
-        body::after {
-            background: #00ff88; /* Verde neón */
-            bottom: 20%;
-            right: 25%;
-        }
+        body::before { background: #8a2be2; top: 20%; left: 25%; }
+        body::after  { background: #00ff88; bottom: 20%; right: 25%; }
 
-        /* Tarjeta de Login (Efecto Cristal) */
         .login-container {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             padding: 40px;
             border-radius: 20px;
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            width: 100%; max-width: 420px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
             z-index: 1;
             text-align: center;
         }
 
-        .brand-header {
-            margin-bottom: 35px;
-        }
-
+        .brand-header { margin-bottom: 35px; }
         .brand-header i {
-            font-size: 3rem;
-            color: #00ff88;
-            text-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+            font-size: 3rem; color: #00ff88;
+            text-shadow: 0 0 15px rgba(0,255,136,0.4);
             margin-bottom: 10px;
         }
+        .brand-header h1 { color: #fff; font-size: 1.8rem; font-weight: 600; letter-spacing: 1px; }
+        .brand-header p  { color: #8a92a6; font-size: 0.9rem; margin-top: 5px; }
 
-        .brand-header h1 {
-            color: #ffffff;
-            font-size: 1.8rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-
-        .brand-header p {
-            color: #8a92a6;
-            font-size: 0.9rem;
-            margin-top: 5px;
-        }
-
-        /* Grupos de Entrada de datos */
-        .input-group {
-            position: relative;
-            margin-bottom: 25px;
-            text-align: left;
-        }
-
+        .input-group { position: relative; margin-bottom: 25px; text-align: left; }
         .input-group label {
-            display: block;
-            color: #a0aec0;
-            font-size: 0.85rem;
-            margin-bottom: 8px;
-            font-weight: 500;
-            letter-spacing: 0.5px;
+            display: block; color: #a0aec0; font-size: 0.85rem;
+            margin-bottom: 8px; font-weight: 500; letter-spacing: 0.5px;
         }
-
-        .input-wrapper {
-            position: relative;
-        }
-
+        .input-wrapper { position: relative; }
         .input-wrapper i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #64748b;
-            transition: color 0.3s;
+            position: absolute; left: 15px; top: 50%;
+            transform: translateY(-50%); color: #64748b; transition: color 0.3s;
         }
-
         .input-wrapper input {
-            width: 100%;
-            padding: 14px 15px 14px 45px;
-            background: rgba(15, 16, 21, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            color: #ffffff;
-            font-size: 0.95rem;
-            outline: none;
-            transition: all 0.3s ease;
+            width: 100%; padding: 14px 15px 14px 45px;
+            background: rgba(15,16,21,0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px; color: #fff; font-size: 0.95rem;
+            outline: none; transition: all 0.3s ease;
         }
-
         .input-wrapper input:focus {
             border-color: #8a2be2;
-            box-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
-            background: rgba(15, 16, 21, 0.8);
+            box-shadow: 0 0 10px rgba(138,43,226,0.3);
+            background: rgba(15,16,21,0.8);
         }
 
-        .input-wrapper input:focus + i {
-            color: #8a2be2;
-        }
-
-        /* Mensaje de Error */
         .error-message {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: #f87171;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            margin-bottom: 20px;
-            display: none; /* Oculto por defecto */
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            background: rgba(239,68,68,0.1);
+            border: 1px solid rgba(239,68,68,0.2);
+            color: #f87171; padding: 12px; border-radius: 8px;
+            font-size: 0.85rem; margin-bottom: 20px;
+            display: none; align-items: center; justify-content: center; gap: 8px;
         }
 
-        /* Botón de Ingreso */
         .btn-login {
-            width: 100%;
-            padding: 14px;
+            width: 100%; padding: 14px;
             background: linear-gradient(135deg, #8a2be2 0%, #4a0e8f 100%);
-            border: none;
-            border-radius: 10px;
-            color: #ffffff;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
+            border: none; border-radius: 10px; color: #fff;
+            font-size: 1rem; font-weight: 600; cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.4);
+            box-shadow: 0 4px 15px rgba(138,43,226,0.4);
         }
-
         .btn-login:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(138, 43, 226, 0.6);
+            box-shadow: 0 6px 20px rgba(138,43,226,0.6);
             background: linear-gradient(135deg, #9b42f5 0%, #5c16b3 100%);
         }
+        .btn-login:active { transform: translateY(1px); }
+        .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-        .btn-login:active {
-            transform: translateY(1px);
-        }
-
-        /* Footer de la tarjeta */
-        .login-footer {
-            margin-top: 25px;
-            color: #64748b;
-            font-size: 0.8rem;
-        }
+        .login-footer { margin-top: 25px; color: #64748b; font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -206,7 +124,6 @@
                     <i class="fa-solid fa-envelope"></i>
                 </div>
             </div>
-
             <div class="input-group">
                 <label for="password">CONTRASEÑA</label>
                 <div class="input-wrapper">
@@ -214,9 +131,8 @@
                     <i class="fa-solid fa-lock"></i>
                 </div>
             </div>
-
-            <button type="submit" class="btn-login">
-                Iniciar Sesión <i class="fa-solid fa-arrow-right-to-bracket" style="margin-left: 8px;"></i>
+            <button type="submit" class="btn-login" id="btnLogin">
+                Iniciar Sesión <i class="fa-solid fa-arrow-right-to-bracket" style="margin-left:8px"></i>
             </button>
         </form>
 
@@ -226,50 +142,51 @@
     </div>
 
     <script>
-        const loginForm = document.getElementById('loginForm');
+        const API_URL    = "https://crm-servirodillos.onrender.com";
+        const loginForm  = document.getElementById('loginForm');
         const errorAlert = document.getElementById('errorAlert');
-        const errorText = document.getElementById('errorText');
+        const errorText  = document.getElementById('errorText');
+        const btnLogin   = document.getElementById('btnLogin');
 
-        // IMPORTANTE: Cambia esta URL por tu link real de Render cuando lo subas
-        const API_URL = "https://crm-servirodillos.onrender.com"; //  Apunta a internet
-        
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            // Ocultamos errores previos
-            errorAlert.style.display = 'none';
 
-            const email = document.getElementById('email').value;
+            // Ocultar error previo y deshabilitar botón mientras carga
+            errorAlert.style.display = 'none';
+            btnLogin.disabled = true;
+            btnLogin.textContent = 'Ingresando...';
+
+            const email    = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
             try {
                 const response = await fetch(`${API_URL}/api/login`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
 
                 const data = await response.json();
-                localStorage.setItem('usuarioCRM', JSON.stringify(data.usuario));
-                
+
+                // ✅ FIX: Verificar error ANTES de guardar en localStorage
                 if (!response.ok) {
-                    // Si el servidor responde con error (400, 401, 500)
                     throw new Error(data.error || "Error al iniciar sesión");
                 }
 
-                // --- ¡ÉXITO! GUARDAMOS LA SESIÓN EN EL NAVEGADOR ---
-                // Guardamos el objeto usuario en localStorage (id, nombre, email, rol)
+                // ✅ Solo guardamos si el login fue exitoso
+                // data.usuario tiene: { id, nombre, email, rol }
                 localStorage.setItem('usuarioCRM', JSON.stringify(data.usuario));
 
-                // Redireccionamos de inmediato al panel principal
+                // Redirigir al panel principal
                 window.location.href = "/";
 
             } catch (error) {
-                // Mostramos el error en la interfaz
                 errorText.textContent = error.message;
                 errorAlert.style.display = 'flex';
+
+                // Rehabilitar botón si hubo error
+                btnLogin.disabled = false;
+                btnLogin.innerHTML = 'Iniciar Sesión <i class="fa-solid fa-arrow-right-to-bracket" style="margin-left:8px"></i>';
             }
         });
     </script>
