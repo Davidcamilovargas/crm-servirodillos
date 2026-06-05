@@ -39,9 +39,7 @@ const db = mysql.createPool({
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    ssl: {
-        rejectUnauthorized: false
-    }
+    ssl: { rejectUnauthorized: false }
 });
 
 
@@ -66,16 +64,16 @@ app.post('/api/login', (req, res) => {
         }
 
         const usuario = results[0];
-        console.log(`🔑 Sesión iniciada para: ${usuario.nombre} (Rol: ${usuario.rol})`);
+        console.log(`🔑 Sesión iniciada: ${usuario.nombre} (Rol: ${usuario.rol})`);
         
-        // ✅ FIX: Se usa "rol" (español) para que sea consistente con todo el frontend
+        // ✅ FIX: "rol" en español, consistente con todo el frontend
         res.json({
             mensaje: "Inicio de sesión exitoso",
             usuario: {
                 id: usuario.id,
                 nombre: usuario.nombre,
                 email: usuario.email,
-                rol: usuario.rol   // ← CORREGIDO: era "role", ahora es "rol"
+                rol: usuario.rol
             }
         });
     });
@@ -96,12 +94,10 @@ app.get('/api/balance', (req, res) => {
     `;
 
     const queryParams = [];
-
     if (vendedorId) {
         query += ` WHERE v.id = ?`;
         queryParams.push(vendedorId);
     }
-
     query += ` GROUP BY v.id;`;
 
     db.query(query, queryParams, (err, resultados) => {
@@ -112,7 +108,7 @@ app.get('/api/balance', (req, res) => {
             balance[row.vendedore_nombre] = {
                 llamadas: Number(row.llamadas),
                 mensajes: Number(row.mensajes),
-                visitas: Number(row.visitas)
+                visitas:  Number(row.visitas)
             };
         });
         res.json(balance);
@@ -131,12 +127,10 @@ app.get('/api/historial', (req, res) => {
     `;
 
     const queryParams = [];
-
     if (vendedorId) {
         query += ` WHERE a.vendedor_id = ?`;
         queryParams.push(vendedorId);
     }
-
     query += ` ORDER BY a.fecha DESC;`;
 
     db.query(query, queryParams, (err, resultados) => {
@@ -151,7 +145,6 @@ app.post('/api/registrar', (req, res) => {
     let { vendedor, cliente, tipoActividad, notas } = req.body; 
 
     let tipoClave = tipoActividad ? tipoActividad.trim().toLowerCase() : '';
-
     if (tipoClave.includes('llamada')) tipoClave = 'llamadas';
     if (tipoClave.includes('mensaje')) tipoClave = 'mensajes';
     if (tipoClave.includes('visita'))  tipoClave = 'visitas';
@@ -163,13 +156,8 @@ app.post('/api/registrar', (req, res) => {
             console.error("❌ Error al insertar actividad:", err);
             return res.status(500).json({ error: err.message });
         }
-
-        console.log(`✅ Actividad guardada para el vendedor ID: ${vendedor}`);
-
-        res.json({
-            mensaje: "¡Actividad registrada y guardada permanentemente en MySQL!",
-            idActividad: result.insertId
-        });
+        console.log(`✅ Actividad guardada para vendedor ID: ${vendedor}`);
+        res.json({ mensaje: "Actividad registrada correctamente.", idActividad: result.insertId });
     });
 });
 
@@ -213,13 +201,19 @@ app.get('/api/pedidos', (req, res) => {
     const { vendedorId, mes, anio } = req.query; 
     
     const fechaActual = new Date();
-    const filtroMes = mes ? parseInt(mes) : (fechaActual.getMonth() + 1);
+    const filtroMes  = mes  ? parseInt(mes)  : (fechaActual.getMonth() + 1);
     const filtroAnio = anio ? parseInt(anio) : fechaActual.getFullYear();
 
     const fechaInicio = `${filtroAnio}-${String(filtroMes).padStart(2, '0')}-01`;
-    const fechaFin = `${filtroAnio}-${String(filtroMes).padStart(2, '0')}-31`;
 
-    let query = `SELECT * FROM pedidos WHERE fecha BETWEEN ? AND ?`;
+    // ✅ FIX CRÍTICO: Calcular el último día real del mes
+    // Día 0 del mes siguiente = último día del mes actual
+    const ultimoDia = new Date(filtroAnio, filtroMes, 0).getDate();
+    const fechaFin  = `${filtroAnio}-${String(filtroMes).padStart(2, '0')}-${String(ultimoDia).padStart(2, '0')}`;
+
+    console.log(`📅 Consultando pedidos: ${fechaInicio} → ${fechaFin} | vendedorId: ${vendedorId || 'todos'}`);
+
+    let query  = `SELECT * FROM pedidos WHERE fecha BETWEEN ? AND ?`;
     let params = [fechaInicio, fechaFin];
 
     if (vendedorId && vendedorId !== 'todos' && vendedorId !== 'null' && vendedorId !== 'undefined') {
@@ -232,12 +226,14 @@ app.get('/api/pedidos', (req, res) => {
     db.query(query, params, (err, pedidos) => {
         if (err) {
             console.error('❌ Error en la base de datos:', err);
-            return res.status(500).json({ error: 'Error interno al cargar el reporte comercial', detalle: err.message });
+            return res.status(500).json({ error: 'Error interno al cargar el reporte', detalle: err.message });
         }
 
         const totalVenta = pedidos.reduce((sum, p) => sum + parseFloat(p.valor || 0), 0);
-        const META_MES = 15000000; 
-        const restante = META_MES - totalVenta;
+        const META_MES   = 15000000; 
+        const restante   = META_MES - totalVenta;
+
+        console.log(`✅ Pedidos encontrados: ${pedidos.length} | Total: $${totalVenta}`);
 
         res.json({
             pedidos: pedidos,
@@ -248,16 +244,16 @@ app.get('/api/pedidos', (req, res) => {
 
 // 3. EDITAR ESTADO DE UN PEDIDO
 app.put('/api/pedidos/:id', (req, res) => {
-    const { id } = req.params;
+    const { id }     = req.params;
     const { estado } = req.body;
 
     if (!estado) return res.status(400).json({ error: 'El estado es requerido.' });
 
     const query = `UPDATE pedidos SET estado = ? WHERE id = ?`;
     
-    db.query(query, [estado, id], (err, result) => {
+    db.query(query, [estado, id], (err) => {
         if (err) {
-            console.error("❌ Error al actualizar estado del pedido:", err);
+            console.error("❌ Error al actualizar estado:", err);
             return res.status(500).json({ error: 'Error al actualizar el estado del pedido' });
         }
         res.json({ message: 'Pedido actualizado con éxito' });
@@ -276,13 +272,12 @@ app.get('/api/clientes', (req, res) => {
         query += ' WHERE vendedor_id = ?';
         queryParams.push(vendedorId);
     }
-
     query += ' ORDER BY nombre ASC';
 
     db.query(query, queryParams, (err, results) => {
         if (err) {
             console.error('❌ Error al obtener clientes:', err);
-            return res.status(500).json({ error: 'Error interno del servidor al consultar clientes' });
+            return res.status(500).json({ error: 'Error interno al consultar clientes' });
         }
         res.json(results);
     });

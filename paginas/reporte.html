@@ -625,8 +625,9 @@
 
   async function guardarPedido(event) {
     event.preventDefault();
+    const fechaInput = document.getElementById('pedFecha').value;
     const nuevoPedido = {
-      fecha:          document.getElementById('pedFecha').value,
+      fecha:          fechaInput,
       numero_pedido:  document.getElementById('pedNumero').value,
       cliente_nombre: document.getElementById('pedCliente').value,
       valor:          document.getElementById('pedValor').value,
