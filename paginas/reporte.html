@@ -195,6 +195,76 @@
   }
   .btn-eliminar:hover { background: rgba(229,62,62,.18); }
 
+  /* NUEVO CLIENTE INLINE */
+  .cliente-row {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .cliente-row select { flex: 1; }
+  .btn-nuevo-cliente {
+    flex-shrink: 0;
+    background: transparent;
+    border: 1px dashed var(--brand-orange);
+    color: var(--brand-orange);
+    font-size: 11px; font-weight: 700;
+    padding: 6px 10px; border-radius: var(--radius-sm);
+    cursor: pointer; white-space: nowrap;
+    transition: background .15s, color .15s;
+    font-family: 'Barlow', sans-serif;
+  }
+  .btn-nuevo-cliente:hover { background: var(--brand-orange); color: #fff; }
+
+  .panel-nuevo-cliente {
+    display: none;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px; margin-top: 10px;
+    position: relative;
+  }
+  .panel-nuevo-cliente.visible { display: block; animation: slideDown .2s ease; }
+  @keyframes slideDown { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+
+  .panel-nuevo-cliente .pnc-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--brand-orange); margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .panel-nuevo-cliente .pnc-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;
+  }
+  .panel-nuevo-cliente .pnc-full { grid-column: 1 / -1; }
+  .panel-nuevo-cliente label {
+    display: block; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .8px;
+    color: var(--ink-3); margin-bottom: 3px;
+  }
+  .panel-nuevo-cliente input, .panel-nuevo-cliente select {
+    width: 100%; font-size: 13px; padding: 6px 8px;
+  }
+  .pnc-actions { display: flex; gap: 7px; justify-content: flex-end; }
+  .btn-pnc-cancel {
+    background: none; border: 1px solid var(--border-2); color: var(--ink-3);
+    font-size: 12px; font-weight: 600; padding: 6px 12px;
+    border-radius: var(--radius-sm); cursor: pointer;
+    font-family: 'Barlow', sans-serif;
+  }
+  .btn-pnc-save {
+    background: var(--brand-orange); color: #fff; border: none;
+    font-size: 12px; font-weight: 700; padding: 6px 14px;
+    border-radius: var(--radius-sm); cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase;
+    letter-spacing: .6px; transition: background .15s;
+  }
+  .btn-pnc-save:hover { background: var(--brand-orange-h); }
+  .btn-pnc-save:disabled { opacity: .5; cursor: not-allowed; }
+  .pnc-msg { font-size: 11px; margin-top: 6px; text-align: center; min-height: 16px; }
+  .pnc-msg.ok    { color: var(--brand-green-d); }
+  .pnc-msg.error { color: #c0392b; }
+
+  @media (max-width: 480px) {
+    .panel-nuevo-cliente .pnc-grid { grid-template-columns: 1fr; }
+  }
+
   /* MODAL COMPARTIDO */
   .modal-overlay {
     display: none; position: fixed; z-index: 1000; inset: 0;
@@ -411,7 +481,37 @@
     <div class="modal-field"><label>🔢 Número de Pedido</label><input type="text" id="pedNumero" placeholder="Ej: 6035" required></div>
     <div class="modal-field">
       <label>🏢 Cliente / Empresa</label>
-      <select id="pedCliente" required><option value="">Cargando clientes...</option></select>
+      <div class="cliente-row">
+        <select id="pedCliente" required><option value="">Cargando clientes...</option></select>
+        <button type="button" class="btn-nuevo-cliente" onclick="toggleNuevoCliente()">＋ Nuevo</button>
+      </div>
+      <!-- Panel inline para crear cliente nuevo -->
+      <div class="panel-nuevo-cliente" id="panelNuevoCliente">
+        <div class="pnc-title">🆕 Registrar cliente nuevo</div>
+        <div class="pnc-grid">
+          <div class="pnc-full">
+            <label>Nombre / Empresa *</label>
+            <input type="text" id="ncNombre" placeholder="Ej: Industrias López S.A.S">
+          </div>
+          <div>
+            <label>Contacto</label>
+            <input type="text" id="ncContacto" placeholder="Nombre contacto">
+          </div>
+          <div>
+            <label>Teléfono</label>
+            <input type="text" id="ncTelefono" placeholder="3XX XXX XXXX">
+          </div>
+          <div class="pnc-full">
+            <label>Ciudad</label>
+            <input type="text" id="ncCiudad" placeholder="Ej: Medellín">
+          </div>
+        </div>
+        <div class="pnc-actions">
+          <button type="button" class="btn-pnc-cancel" onclick="toggleNuevoCliente()">Cancelar</button>
+          <button type="button" class="btn-pnc-save" id="btnGuardarNuevoCliente" onclick="guardarNuevoCliente()">✔ Crear y Seleccionar</button>
+        </div>
+        <div class="pnc-msg" id="pncMsg"></div>
+      </div>
     </div>
     <div class="modal-field"><label>💵 Valor del Pedido ($)</label><input type="number" id="pedValor" placeholder="Ej: 1050000" required></div>
     <div class="modal-field">
@@ -610,6 +710,14 @@
 
   function cerrarModalPedido() {
     document.getElementById('modalPedido').style.display = 'none';
+    // Cerrar panel de nuevo cliente si estaba abierto
+    const panel = document.getElementById('panelNuevoCliente');
+    if (panel.classList.contains('visible')) {
+      panel.classList.remove('visible');
+      ['ncNombre','ncContacto','ncTelefono','ncCiudad'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+    }
   }
 
   /* ── GUARDAR (crear o editar) ── */
@@ -654,6 +762,76 @@
         alert("Error al guardar: " + (err.error || 'Error desconocido'));
       }
     } catch (e) { console.error("❌ Error guardando pedido:", e); }
+  }
+
+  /* ── NUEVO CLIENTE INLINE ── */
+  function toggleNuevoCliente() {
+    const panel = document.getElementById('panelNuevoCliente');
+    const isOpen = panel.classList.toggle('visible');
+    if (isOpen) {
+      document.getElementById('ncNombre').focus();
+      document.getElementById('pncMsg').textContent = '';
+    } else {
+      // Limpiar campos al cerrar
+      ['ncNombre','ncContacto','ncTelefono','ncCiudad'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+    }
+  }
+
+  async function guardarNuevoCliente() {
+    const nombre = document.getElementById('ncNombre').value.trim();
+    if (!nombre) {
+      mostrarPncMsg('El nombre es obligatorio.', 'error');
+      document.getElementById('ncNombre').focus();
+      return;
+    }
+
+    const btn = document.getElementById('btnGuardarNuevoCliente');
+    btn.disabled = true;
+    btn.textContent = 'Guardando...';
+    mostrarPncMsg('', '');
+
+    const nuevoCliente = {
+      nombre:    nombre,
+      contacto:  document.getElementById('ncContacto').value.trim() || null,
+      telefono:  document.getElementById('ncTelefono').value.trim() || null,
+      ciudad:    document.getElementById('ncCiudad').value.trim()   || null,
+      vendedor_id: ID_USUARIO
+    };
+
+    try {
+      const res = await fetch(`${API_URL}/api/clientes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nuevoCliente)
+      });
+
+      if (res.ok) {
+        mostrarPncMsg('✅ Cliente creado correctamente.', 'ok');
+        // Recargar lista y seleccionar el nuevo
+        await cargarClientesEnModal(nombre);
+        // Cerrar panel tras un momento
+        setTimeout(() => {
+          toggleNuevoCliente();
+        }, 900);
+      } else {
+        const err = await res.json();
+        mostrarPncMsg('Error: ' + (err.error || 'No se pudo guardar.'), 'error');
+      }
+    } catch (e) {
+      mostrarPncMsg('Error de conexión. Intenta de nuevo.', 'error');
+      console.error("❌ Error creando cliente:", e);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '✔ Crear y Seleccionar';
+    }
+  }
+
+  function mostrarPncMsg(texto, tipo) {
+    const el = document.getElementById('pncMsg');
+    el.textContent = texto;
+    el.className   = 'pnc-msg ' + tipo;
   }
 
   /* ── MODAL ELIMINAR ── */
