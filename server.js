@@ -18,11 +18,11 @@ app.get('/reporte', (req, res) => res.sendFile(path.join(__dirname, 'paginas', '
 
 // --- BASE DE DATOS ---
 const db = mysql.createPool({
-    host: process.env.DB_HOST || "mysql-2d9ef1b2-davidleon1004-b427.l.aivencloud.com",
-    user: process.env.DB_USER || "avnadmin",
+    host:     process.env.DB_HOST     || "mysql-2d9ef1b2-davidleon1004-b427.l.aivencloud.com",
+    user:     process.env.DB_USER     || "avnadmin",
     password: process.env.DB_PASSWORD || "TU_CONTRASEÑA_DE_AIVEN",
-    database: process.env.DB_NAME || "defaultdb",
-    port: process.env.DB_PORT || 12345,
+    database: process.env.DB_NAME     || "defaultdb",
+    port:     process.env.DB_PORT     || 12345,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
@@ -30,19 +30,20 @@ const db = mysql.createPool({
 });
 
 // ✅ METAS PERSONALIZADAS POR VENDEDOR
-// Clave: vendedor_id | Valor: meta en pesos colombianos
 const METAS_VENDEDORES = {
     1: 80000000,   // Ismael Vargas → $80.000.000
     2: 30000000,   // David Vargas  → $30.000.000
 };
-const META_DEFAULT = 15000000; // Fallback si no está en el mapa
+const META_DEFAULT = 15000000;
 
 function getMetaVendedor(vendedorId) {
     return METAS_VENDEDORES[parseInt(vendedorId)] || META_DEFAULT;
 }
 
 
-// --- LOGIN ---
+// ─────────────────────────────────────────
+//  LOGIN
+// ─────────────────────────────────────────
 app.post('/api/login', (req, res) => {
     const { email, password } = req.body;
     if (!email || !password)
@@ -64,7 +65,6 @@ app.post('/api/login', (req, res) => {
                 nombre: usuario.nombre,
                 email:  usuario.email,
                 rol:    usuario.rol,
-                // ✅ Enviamos la meta del vendedor al frontend al momento del login
                 meta:   getMetaVendedor(usuario.id)
             }
         });
@@ -72,7 +72,9 @@ app.post('/api/login', (req, res) => {
 });
 
 
-// --- BALANCE ---
+// ─────────────────────────────────────────
+//  BALANCE
+// ─────────────────────────────────────────
 app.get('/api/balance', (req, res) => {
     const { vendedorId } = req.query;
     let query = `
@@ -102,7 +104,9 @@ app.get('/api/balance', (req, res) => {
 });
 
 
-// --- HISTORIAL ---
+// ─────────────────────────────────────────
+//  HISTORIAL
+// ─────────────────────────────────────────
 app.get('/api/historial', (req, res) => {
     const { vendedorId } = req.query;
     let query = `
@@ -121,7 +125,9 @@ app.get('/api/historial', (req, res) => {
 });
 
 
-// --- REGISTRAR ACTIVIDAD ---
+// ─────────────────────────────────────────
+//  REGISTRAR ACTIVIDAD
+// ─────────────────────────────────────────
 app.post('/api/registrar', (req, res) => {
     let { vendedor, cliente, tipoActividad, notas } = req.body;
     let tipoClave = tipoActividad ? tipoActividad.trim().toLowerCase() : '';
@@ -140,7 +146,9 @@ app.post('/api/registrar', (req, res) => {
 });
 
 
-// --- VENDEDORES ---
+// ─────────────────────────────────────────
+//  VENDEDORES
+// ─────────────────────────────────────────
 app.get('/api/vendedores', (req, res) => {
     db.query("SELECT id, nombre FROM vendedores ORDER BY nombre ASC", (err, results) => {
         if (err) return res.status(500).json({ error: "Error en el servidor" });
@@ -149,20 +157,41 @@ app.get('/api/vendedores', (req, res) => {
 });
 
 
-// --- PEDIDOS ---
+// ─────────────────────────────────────────
+//  PEDIDOS
+// ─────────────────────────────────────────
 
-// POST: Registrar pedido
+// POST: Registrar pedido — ✅ valida duplicado antes de insertar
 app.post('/api/pedidos', (req, res) => {
     const { fecha, numero_pedido, cliente_nombre, estado, valor, vendedor_id } = req.body;
+
     if (!fecha || !numero_pedido || !cliente_nombre || !valor || !vendedor_id)
         return res.status(400).json({ error: 'Faltan campos obligatorios.' });
 
+    // ── 1. Verificar si el número de pedido ya existe ──
     db.query(
-        `INSERT INTO pedidos (fecha, numero_pedido, cliente_nombre, estado, valor, vendedor_id) VALUES (?, ?, ?, ?, ?, ?)`,
-        [fecha, numero_pedido, cliente_nombre, estado || 'Pendiente', valor, vendedor_id],
-        (err, result) => {
-            if (err) return res.status(500).json({ error: 'Error al guardar pedido' });
-            res.status(201).json({ message: 'Pedido registrado', id: result.insertId });
+        `SELECT id FROM pedidos WHERE numero_pedido = ?`,
+        [numero_pedido.toString().trim()],
+        (err, existing) => {
+            if (err) return res.status(500).json({ error: 'Error al verificar duplicado.' });
+
+            if (existing.length > 0) {
+                return res.status(409).json({
+                    error: `El pedido #${numero_pedido} ya está registrado. Verifica el número e intenta de nuevo.`
+                });
+            }
+
+            // ── 2. Insertar si no existe ──
+            db.query(
+                `INSERT INTO pedidos (fecha, numero_pedido, cliente_nombre, estado, valor, vendedor_id)
+                 VALUES (?, ?, ?, ?, ?, ?)`,
+                [fecha, numero_pedido.toString().trim(), cliente_nombre, estado || 'Pendiente', valor, vendedor_id],
+                (err, result) => {
+                    if (err) return res.status(500).json({ error: 'Error al guardar pedido.' });
+                    console.log(`📦 Pedido #${numero_pedido} registrado (id: ${result.insertId})`);
+                    res.status(201).json({ message: 'Pedido registrado', id: result.insertId });
+                }
+            );
         }
     );
 });
@@ -176,7 +205,6 @@ app.get('/api/pedidos', (req, res) => {
     const filtroAnio  = anio ? parseInt(anio) : fechaActual.getFullYear();
 
     const fechaInicio = `${filtroAnio}-${String(filtroMes).padStart(2,'0')}-01`;
-    // ✅ Último día real del mes (no hardcodeado a 31)
     const ultimoDia   = new Date(filtroAnio, filtroMes, 0).getDate();
     const fechaFin    = `${filtroAnio}-${String(filtroMes).padStart(2,'0')}-${String(ultimoDia).padStart(2,'0')}`;
 
@@ -201,12 +229,10 @@ app.get('/api/pedidos', (req, res) => {
 
         const totalVenta = pedidos.reduce((sum, p) => sum + parseFloat(p.valor || 0), 0);
 
-        // ✅ Meta personalizada: si hay un vendedor específico, usa su meta; si son "todos", suma las metas
         let metaMes;
         if (esVendedorEspecifico) {
             metaMes = getMetaVendedor(vendedorId);
         } else {
-            // Para "todos los vendedores", sumamos todas las metas
             metaMes = Object.values(METAS_VENDEDORES).reduce((a, b) => a + b, 0);
         }
 
@@ -220,20 +246,76 @@ app.get('/api/pedidos', (req, res) => {
     });
 });
 
-// PUT: Cambiar estado pedido
+// PUT: Editar pedido completo (todos los campos) — ✅ nuevo
 app.put('/api/pedidos/:id', (req, res) => {
     const { id } = req.params;
-    const { estado } = req.body;
-    if (!estado) return res.status(400).json({ error: 'El estado es requerido.' });
+    const { estado, fecha, numero_pedido, cliente_nombre, valor } = req.body;
 
-    db.query(`UPDATE pedidos SET estado = ? WHERE id = ?`, [estado, id], (err) => {
-        if (err) return res.status(500).json({ error: 'Error al actualizar' });
-        res.json({ message: 'Pedido actualizado con éxito' });
+    // Si solo viene el estado (cambio rápido desde la tabla), actualizar solo ese campo
+    if (estado && !fecha && !numero_pedido && !cliente_nombre && !valor) {
+        db.query(
+            `UPDATE pedidos SET estado = ? WHERE id = ?`,
+            [estado, id],
+            (err) => {
+                if (err) return res.status(500).json({ error: 'Error al actualizar estado.' });
+                res.json({ message: 'Estado actualizado.' });
+            }
+        );
+        return;
+    }
+
+    // Edición completa desde el modal
+    if (!fecha || !numero_pedido || !cliente_nombre || !valor || !estado)
+        return res.status(400).json({ error: 'Faltan campos obligatorios.' });
+
+    // Verificar duplicado de número de pedido (excluyendo el propio registro)
+    db.query(
+        `SELECT id FROM pedidos WHERE numero_pedido = ? AND id != ?`,
+        [numero_pedido.toString().trim(), id],
+        (err, existing) => {
+            if (err) return res.status(500).json({ error: 'Error al verificar duplicado.' });
+
+            if (existing.length > 0) {
+                return res.status(409).json({
+                    error: `El pedido #${numero_pedido} ya está registrado en otro registro.`
+                });
+            }
+
+            db.query(
+                `UPDATE pedidos SET fecha = ?, numero_pedido = ?, cliente_nombre = ?, estado = ?, valor = ?
+                 WHERE id = ?`,
+                [fecha, numero_pedido.toString().trim(), cliente_nombre, estado, valor, id],
+                (err) => {
+                    if (err) return res.status(500).json({ error: 'Error al editar pedido.' });
+                    console.log(`✏️  Pedido id:${id} editado`);
+                    res.json({ message: 'Pedido actualizado.' });
+                }
+            );
+        }
+    );
+});
+
+// DELETE: Eliminar pedido — ✅ nuevo
+app.delete('/api/pedidos/:id', (req, res) => {
+    const { id } = req.params;
+
+    db.query(`DELETE FROM pedidos WHERE id = ?`, [id], (err, result) => {
+        if (err) return res.status(500).json({ error: 'Error al eliminar el pedido.' });
+
+        if (result.affectedRows === 0)
+            return res.status(404).json({ error: 'Pedido no encontrado.' });
+
+        console.log(`🗑️  Pedido id:${id} eliminado`);
+        res.json({ message: 'Pedido eliminado correctamente.' });
     });
 });
 
 
-// --- CLIENTES ---
+// ─────────────────────────────────────────
+//  CLIENTES
+// ─────────────────────────────────────────
+
+// GET: Listar clientes
 app.get('/api/clientes', (req, res) => {
     const { vendedorId } = req.query;
     let query = 'SELECT * FROM clientes';
@@ -242,11 +324,82 @@ app.get('/api/clientes', (req, res) => {
     query += ' ORDER BY nombre ASC';
 
     db.query(query, queryParams, (err, results) => {
-        if (err) return res.status(500).json({ error: 'Error al consultar clientes' });
+        if (err) return res.status(500).json({ error: 'Error al consultar clientes.' });
         res.json(results);
     });
 });
 
+// POST: Crear cliente — ✅ nuevo
+app.post('/api/clientes', (req, res) => {
+    const { nombre, contacto, telefono, ciudad, vendedor_id } = req.body;
 
-// --- INICIALIZACIÓN ---
+    if (!nombre || !nombre.trim())
+        return res.status(400).json({ error: 'El nombre del cliente es obligatorio.' });
+
+    // Verificar que no exista un cliente con el mismo nombre para este vendedor
+    db.query(
+        `SELECT id FROM clientes WHERE LOWER(nombre) = LOWER(?) AND vendedor_id = ?`,
+        [nombre.trim(), vendedor_id],
+        (err, existing) => {
+            if (err) return res.status(500).json({ error: 'Error al verificar cliente.' });
+
+            if (existing.length > 0)
+                return res.status(409).json({ error: `Ya tienes un cliente llamado "${nombre}".` });
+
+            db.query(
+                `INSERT INTO clientes (nombre, contacto, telefono, ciudad, vendedor_id)
+                 VALUES (?, ?, ?, ?, ?)`,
+                [nombre.trim(), contacto || null, telefono || null, ciudad || null, vendedor_id],
+                (err, result) => {
+                    if (err) return res.status(500).json({ error: 'Error al crear cliente.' });
+                    console.log(`👤 Cliente "${nombre}" creado (id: ${result.insertId})`);
+                    res.status(201).json({ message: 'Cliente creado.', id: result.insertId });
+                }
+            );
+        }
+    );
+});
+
+// PUT: Editar cliente — ✅ nuevo
+app.put('/api/clientes/:id', (req, res) => {
+    const { id } = req.params;
+    const { nombre, contacto, telefono, ciudad } = req.body;
+
+    if (!nombre || !nombre.trim())
+        return res.status(400).json({ error: 'El nombre del cliente es obligatorio.' });
+
+    db.query(
+        `UPDATE clientes SET nombre = ?, contacto = ?, telefono = ?, ciudad = ? WHERE id = ?`,
+        [nombre.trim(), contacto || null, telefono || null, ciudad || null, id],
+        (err, result) => {
+            if (err) return res.status(500).json({ error: 'Error al actualizar cliente.' });
+
+            if (result.affectedRows === 0)
+                return res.status(404).json({ error: 'Cliente no encontrado.' });
+
+            console.log(`✏️  Cliente id:${id} actualizado`);
+            res.json({ message: 'Cliente actualizado correctamente.' });
+        }
+    );
+});
+
+// DELETE: Eliminar cliente — ✅ nuevo
+app.delete('/api/clientes/:id', (req, res) => {
+    const { id } = req.params;
+
+    db.query(`DELETE FROM clientes WHERE id = ?`, [id], (err, result) => {
+        if (err) return res.status(500).json({ error: 'Error al eliminar el cliente.' });
+
+        if (result.affectedRows === 0)
+            return res.status(404).json({ error: 'Cliente no encontrado.' });
+
+        console.log(`🗑️  Cliente id:${id} eliminado`);
+        res.json({ message: 'Cliente eliminado correctamente.' });
+    });
+});
+
+
+// ─────────────────────────────────────────
+//  INICIALIZACIÓN
+// ─────────────────────────────────────────
 app.listen(PORT, () => console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`));
